@@ -1,6 +1,7 @@
 /**
  * Bank Marketing Campaign Analysis Dashboard
  * Central State Store & Reactive Event Dispatcher
+ * Seamlessly integrates with Python Flask REST backend (with graceful offline fallback)
  */
 
 class AppStateStore {
@@ -11,6 +12,9 @@ class AppStateStore {
       sourceDisplayName: 'Benchmark Cohort (Demo)',
       fileName: null,
       lastUpdated: new Date(),
+      backendConnected: false,
+      backendInfo: null,
+      isLoading: false,
 
       // Filter settings
       filters: {
@@ -22,6 +26,18 @@ class AppStateStore {
         marital: 'all',
         touches: 'all', // 'all' | '1' | '2' | '3' | '4+'
         searchQuery: ''
+      },
+
+      // Backend API aggregated cache
+      apiData: {
+        kpis: null,
+        periods: null,
+        channels: null,
+        frequencies: null,
+        segments: null,
+        insights: null,
+        tableRecords: null,
+        totalRecords: 0
       },
 
       // Table pagination and sorting
@@ -39,7 +55,6 @@ class AppStateStore {
     this.listeners = [];
   }
 
-  // Subscribe to state updates
   subscribe(fn) {
     this.listeners.push(fn);
     return () => {
@@ -57,7 +72,87 @@ class AppStateStore {
     });
   }
 
-  // Load a new dataset (either Demo or uploaded CSV)
+  async checkBackendConnection() {
+    try {
+      const res = await ApiClient.checkHealth();
+      if (res.ok && res.data && res.data.status === 'healthy') {
+        this.state.backendConnected = true;
+        this.state.backendInfo = res.data;
+        if (res.data.activeDataset) {
+          this.state.sourceDisplayName = `${res.data.activeDataset} (${(res.data.activeDatasetRows || 0).toLocaleString()} records)`;
+        }
+        await this.syncWithBackend();
+        return true;
+      }
+    } catch (e) {
+      console.warn('Backend API offline. Running in client-side in-memory mode.');
+    }
+    this.state.backendConnected = false;
+    return false;
+  }
+
+  async syncWithBackend() {
+    if (!this.state.backendConnected) return;
+
+    this.state.isLoading = true;
+    const f = {
+      month: this.state.filters.month,
+      job: this.state.filters.job,
+      education: this.state.filters.education,
+      contact: this.state.filters.contact,
+      outcome: this.state.filters.outcome,
+      marital: this.state.filters.marital,
+      touches: this.state.filters.touches,
+      search: this.state.filters.searchQuery
+    };
+
+    try {
+      // Parallel fetch for speed
+      const [dashRes, periodRes, channelRes, freqRes, segRes, insRes, recRes] = await Promise.all([
+        ApiClient.fetchDashboard(f),
+        ApiClient.fetchPeriodAnalytics(f),
+        ApiClient.fetchChannelAnalytics(f),
+        ApiClient.fetchFrequencyAnalytics(f),
+        ApiClient.fetchSegmentAnalytics(f),
+        ApiClient.fetchInsights(f),
+        ApiClient.fetchRecords(
+          this.state.table.currentPage,
+          this.state.table.pageSize,
+          this.state.table.sortColumn,
+          this.state.table.sortDirection,
+          f
+        )
+      ]);
+
+      if (dashRes.ok && dashRes.data) {
+        this.state.apiData.kpis = dashRes.data.kpis;
+        this.state.apiData.outcomeDistribution = dashRes.data.outcomeDistribution;
+        if (dashRes.data.activeDataset && dashRes.data.activeDataset.filename) {
+          const fn = dashRes.data.activeDataset.filename;
+          const count = dashRes.data.activeDataset.filteredRecords !== undefined
+            ? dashRes.data.activeDataset.filteredRecords
+            : dashRes.data.activeDataset.totalRecords;
+          this.state.sourceDisplayName = `${fn} (${count.toLocaleString()} records)`;
+        }
+      }
+
+      if (periodRes.ok && periodRes.data) this.state.apiData.periods = periodRes.data.periods;
+      if (channelRes.ok && channelRes.data) this.state.apiData.channels = channelRes.data.channels;
+      if (freqRes.ok && freqRes.data) this.state.apiData.frequencies = freqRes.data.frequencies;
+      if (segRes.ok && segRes.data) this.state.apiData.segments = segRes.data;
+      if (insRes.ok && insRes.data) this.state.apiData.insights = insRes.data.insights;
+      if (recRes.ok && recRes.data) {
+        this.state.apiData.tableRecords = recRes.data.records;
+        this.state.apiData.totalRecords = recRes.data.totalRecords;
+      }
+    } catch (err) {
+      console.error('Failed to sync with backend:', err);
+    } finally {
+      this.state.isLoading = false;
+      this.notify('api_synced');
+    }
+  }
+
   setDataset(records, source = 'demo', fileName = null) {
     this.state.rawDataset = records;
     this.state.activeSource = source;
@@ -67,22 +162,28 @@ class AppStateStore {
       : `${fileName || 'Uploaded Dataset'} (${records.length.toLocaleString()} records)`;
     this.state.lastUpdated = new Date();
     
-    // Reset filters and table page
     this.resetFilters(false);
     this.state.table.currentPage = 1;
-    this.notify('dataset_changed');
-  }
 
-  // Update specific filter
-  setFilter(key, value) {
-    if (this.state.filters[key] !== value) {
-      this.state.filters[key] = value;
-      this.state.table.currentPage = 1; // Reset to page 1 on filter change
-      this.notify('filters_changed');
+    if (this.state.backendConnected) {
+      this.syncWithBackend();
+    } else {
+      this.notify('dataset_changed');
     }
   }
 
-  // Reset all filters to default
+  setFilter(key, value) {
+    if (this.state.filters[key] !== value) {
+      this.state.filters[key] = value;
+      this.state.table.currentPage = 1;
+      if (this.state.backendConnected) {
+        this.syncWithBackend();
+      } else {
+        this.notify('filters_changed');
+      }
+    }
+  }
+
   resetFilters(notify = true) {
     this.state.filters = {
       month: 'all',
@@ -96,11 +197,14 @@ class AppStateStore {
     };
     this.state.table.currentPage = 1;
     if (notify) {
-      this.notify('filters_changed');
+      if (this.state.backendConnected) {
+        this.syncWithBackend();
+      } else {
+        this.notify('filters_changed');
+      }
     }
   }
 
-  // Count active non-default filters
   getActiveFilterCount() {
     let count = 0;
     const f = this.state.filters;
@@ -115,7 +219,6 @@ class AppStateStore {
     return count;
   }
 
-  // Set active page view (dashboard, analytics, segments, upload, reports, settings)
   setActiveView(viewId) {
     if (this.state.activeView !== viewId) {
       this.state.activeView = viewId;
@@ -123,16 +226,23 @@ class AppStateStore {
     }
   }
 
-  // Table pagination & sorting controls
   setTablePage(page) {
     this.state.table.currentPage = page;
-    this.notify('table_changed');
+    if (this.state.backendConnected) {
+      this.syncWithBackend();
+    } else {
+      this.notify('table_changed');
+    }
   }
 
   setTablePageSize(size) {
     this.state.table.pageSize = parseInt(size, 10);
     this.state.table.currentPage = 1;
-    this.notify('table_changed');
+    if (this.state.backendConnected) {
+      this.syncWithBackend();
+    } else {
+      this.notify('table_changed');
+    }
   }
 
   setTableSort(column) {
@@ -142,49 +252,26 @@ class AppStateStore {
       this.state.table.sortColumn = column;
       this.state.table.sortDirection = 'asc';
     }
-    this.notify('table_changed');
+    if (this.state.backendConnected) {
+      this.syncWithBackend();
+    } else {
+      this.notify('table_changed');
+    }
   }
 
-  // Returns dataset filtered by current user filters
+  // Client-side fallback filtered dataset
   getFilteredDataset() {
     const { rawDataset, filters } = this.state;
     if (!rawDataset || rawDataset.length === 0) return [];
 
     return rawDataset.filter(item => {
-      // Month filter
-      if (filters.month !== 'all' && (item.month || '').toLowerCase() !== filters.month.toLowerCase()) {
-        return false;
-      }
+      if (filters.month !== 'all' && (item.month || '').toLowerCase() !== filters.month.toLowerCase()) return false;
+      if (filters.job !== 'all' && (item.job || '').toLowerCase() !== filters.job.toLowerCase()) return false;
+      if (filters.education !== 'all' && (item.education || '').toLowerCase() !== filters.education.toLowerCase()) return false;
+      if (filters.contact !== 'all' && (item.contact || '').toLowerCase() !== filters.contact.toLowerCase()) return false;
+      if (filters.outcome !== 'all' && (item.y || '').toLowerCase() !== filters.outcome.toLowerCase()) return false;
+      if (filters.marital !== 'all' && (item.marital || '').toLowerCase() !== filters.marital.toLowerCase()) return false;
 
-      // Job filter
-      if (filters.job !== 'all' && (item.job || '').toLowerCase() !== filters.job.toLowerCase()) {
-        return false;
-      }
-
-      // Education filter
-      if (filters.education !== 'all' && (item.education || '').toLowerCase() !== filters.education.toLowerCase()) {
-        return false;
-      }
-
-      // Contact channel filter
-      if (filters.contact !== 'all' && (item.contact || '').toLowerCase() !== filters.contact.toLowerCase()) {
-        return false;
-      }
-
-      // Outcome filter ('yes' or 'no')
-      if (filters.outcome !== 'all') {
-        const itemY = (item.y || '').toLowerCase();
-        if (itemY !== filters.outcome.toLowerCase()) {
-          return false;
-        }
-      }
-
-      // Marital status filter
-      if (filters.marital !== 'all' && (item.marital || '').toLowerCase() !== filters.marital.toLowerCase()) {
-        return false;
-      }
-
-      // Touches / campaign contacts filter
       if (filters.touches !== 'all') {
         const cmp = Number(item.campaign);
         if (filters.touches === '1' && cmp !== 1) return false;
@@ -193,7 +280,6 @@ class AppStateStore {
         if (filters.touches === '4+' && cmp < 4) return false;
       }
 
-      // Text search query across attributes
       if (filters.searchQuery && filters.searchQuery.trim().length > 0) {
         const q = filters.searchQuery.toLowerCase().trim();
         const matches = 
@@ -212,27 +298,37 @@ class AppStateStore {
     });
   }
 
-  // Returns paginated and sorted slice of filtered data for table view
   getPaginatedTableData() {
+    // If backend data is ready, return it
+    if (this.state.backendConnected && this.state.apiData.tableRecords) {
+      const records = this.state.apiData.tableRecords;
+      const totalRecords = this.state.apiData.totalRecords || records.length;
+      const { currentPage, pageSize } = this.state.table;
+      const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
+      const startIndex = (currentPage - 1) * pageSize;
+      return {
+        records,
+        totalRecords,
+        totalPages,
+        currentPage,
+        pageSize,
+        startIndex,
+        endIndex: Math.min(startIndex + pageSize, totalRecords)
+      };
+    }
+
+    // Client-side fallback
     const filtered = this.getFilteredDataset();
     const { sortColumn, sortDirection, currentPage, pageSize } = this.state.table;
 
-    // Sort
     const sorted = [...filtered].sort((a, b) => {
-      let valA = a[sortColumn];
-      let valB = b[sortColumn];
-
-      if (valA === undefined || valA === null) valA = '';
-      if (valB === undefined || valB === null) valB = '';
-
-      // Numeric comparison
+      let valA = a[sortColumn] ?? '';
+      let valB = b[sortColumn] ?? '';
       const numA = Number(valA);
       const numB = Number(valB);
       if (!isNaN(numA) && !isNaN(numB) && typeof valA !== 'string' && typeof valB !== 'string') {
         return sortDirection === 'asc' ? numA - numB : numB - numA;
       }
-
-      // String comparison
       const strA = String(valA).toLowerCase();
       const strB = String(valB).toLowerCase();
       if (strA < strB) return sortDirection === 'asc' ? -1 : 1;
@@ -244,10 +340,9 @@ class AppStateStore {
     const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
     const safePage = Math.min(Math.max(1, currentPage), totalPages);
     const startIndex = (safePage - 1) * pageSize;
-    const records = sorted.slice(startIndex, startIndex + pageSize);
 
     return {
-      records,
+      records: sorted.slice(startIndex, startIndex + pageSize),
       totalRecords,
       totalPages,
       currentPage: safePage,
@@ -258,7 +353,6 @@ class AppStateStore {
   }
 }
 
-// Global App State Instance
 const appState = new AppStateStore();
 
 if (typeof window !== 'undefined') {

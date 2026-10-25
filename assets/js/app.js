@@ -1,19 +1,61 @@
 /**
  * Bank Marketing Campaign Analysis Dashboard
- * Application Bootstrap & Main Controller
+ * Application Bootstrap & Main Controller (Flask Backend + Client Fallback)
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // 1. Initialize UI Handlers
   UIEngine.init();
 
-  // 2. Subscribe Controller to State Updates
+  // 2. Render helper function
+  const renderDashboardViews = (state) => {
+    const isApi = state.backendConnected && state.apiData.kpis;
+
+    // A. KPIs
+    const kpis = isApi ? state.apiData.kpis : AnalyticsEngine.computeKPIs(appState.getFilteredDataset());
+    UIEngine.updateKPIs(kpis);
+
+    // B. Header indicators
+    UIEngine.updateHeaderIndicators(state);
+
+    // C. Dynamic Insights
+    const insights = isApi && state.apiData.insights
+      ? state.apiData.insights
+      : AnalyticsEngine.generateInsights(appState.getFilteredDataset());
+    UIEngine.renderInsights(insights);
+
+    // D. Charts
+    if (isApi) {
+      if (state.apiData.periods) ChartsEngine.renderPeriodChart('chart-period', state.apiData.periods);
+      if (state.apiData.outcomeDistribution) ChartsEngine.renderOutcomeChart('chart-outcome', 'doughnut-center-rate', state.apiData.outcomeDistribution);
+      if (state.apiData.channels) ChartsEngine.renderChannelChart('chart-channel', state.apiData.channels);
+      if (state.apiData.frequencies) ChartsEngine.renderFatigueChart('chart-fatigue', state.apiData.frequencies);
+      if (state.apiData.segments && state.apiData.segments.jobs) ChartsEngine.renderJobSegmentChart('chart-job-segments', state.apiData.segments.jobs);
+      ChartsEngine.renderEducationHousingChart('chart-education-housing', appState.getFilteredDataset());
+    } else {
+      ChartsEngine.renderAll(appState.getFilteredDataset());
+    }
+
+    // E. Customer Segments View
+    if (isApi && state.apiData.segments) {
+      UIEngine.renderCustomerSegments(state.apiData.segments);
+    } else {
+      UIEngine.renderCustomerSegments(appState.getFilteredDataset());
+    }
+
+    // F. Data Table
+    UIEngine.renderTable();
+
+    // G. Report View
+    UIEngine.updateReportView(state, kpis);
+  };
+
+  // 3. Subscribe to state updates
   appState.subscribe((state, eventType) => {
-    // A. Handle View Changes (switching between Dashboard, Analytics, Segments, Upload, Reports, Settings)
-    if (eventType === 'view_changed' || eventType === 'dataset_changed') {
+    // Handle view tab switching
+    if (eventType === 'view_changed') {
       const activeView = state.activeView;
 
-      // Update sidebar active links
       document.querySelectorAll('.sidebar-nav-link').forEach(link => {
         if (link.getAttribute('data-view-target') === activeView) {
           link.classList.add('active');
@@ -22,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Show the selected page view
       document.querySelectorAll('.page-view').forEach(view => {
         if (view.id === `view-${activeView}`) {
           view.classList.add('active-view');
@@ -31,48 +72,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Scroll smoothly to top of content area
       const contentArea = document.querySelector('.content-area');
       if (contentArea) contentArea.scrollTop = 0;
     }
 
-    // B. Calculate Filtered Data & Analytics
-    const filteredRecords = appState.getFilteredDataset();
-    const kpis = AnalyticsEngine.computeKPIs(filteredRecords);
-    const insights = AnalyticsEngine.generateInsights(filteredRecords);
-
-    // C. Update Topbar & Indicators
-    UIEngine.updateHeaderIndicators(state);
-
-    // D. Update KPI Values Across Views
-    UIEngine.updateKPIs(kpis);
-
-    // E. Render Dynamic Insight Cards
-    UIEngine.renderInsights(insights);
-
-    // F. Render Interactive Charts
-    ChartsEngine.renderAll(filteredRecords);
-
-    // G. Render Customer Segments View
-    UIEngine.renderCustomerSegments(filteredRecords);
-
-    // H. Render Data Table & Pagination
-    UIEngine.renderTable();
-
-    // I. Update Executive Report View Meta
-    UIEngine.updateReportView(state, kpis);
+    renderDashboardViews(state);
   });
 
-  // 3. Pre-load benchmark dataset
-  if (typeof window.DEMO_CAMPAIGN_DATA !== 'undefined' && Array.isArray(window.DEMO_CAMPAIGN_DATA)) {
-    appState.setDataset(window.DEMO_CAMPAIGN_DATA, 'demo');
+  // 4. Initialize Data Source: Check Flask Backend first
+  const connected = await appState.checkBackendConnection();
+
+  if (connected) {
     UIEngine.showToast(
-      'Bank Marketing BI Initialized',
-      'Loaded 1,250 benchmark campaign records. You can filter, explore segments, or upload your own CSV.',
-      'info'
+      'Flask Backend Online',
+      'Connected to Python Flask REST API & SQLite database (Port 5000).',
+      'success'
     );
   } else {
-    console.warn('DEMO_CAMPAIGN_DATA not found. Starting with empty dataset.');
-    appState.setDataset([], 'demo');
+    // Fallback to client-side benchmark dataset
+    if (typeof window.DEMO_CAMPAIGN_DATA !== 'undefined' && Array.isArray(window.DEMO_CAMPAIGN_DATA)) {
+      appState.setDataset(window.DEMO_CAMPAIGN_DATA, 'demo');
+      UIEngine.showToast(
+        'Client-Side Mode Active',
+        'Backend not detected on :5000. Operating in in-memory client mode with benchmark dataset.',
+        'info'
+      );
+    } else {
+      appState.setDataset([], 'demo');
+    }
   }
 });

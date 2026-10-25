@@ -7,6 +7,7 @@ const APP_CONFIG = {
   appName: 'BankPulse BI',
   appVersion: '2.4.0',
   benchmarkResponseRate: 11.5, // Industry benchmark percentage
+  apiBaseUrl: 'http://localhost:5000/api', // Flask backend endpoint
   
   // Standard schema columns expected in the Bank Marketing dataset (UCI standard)
   schema: {

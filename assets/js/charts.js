@@ -1,14 +1,12 @@
 /**
  * Bank Marketing Campaign Analysis Dashboard
  * Chart.js Integration & Visual Data Visualizations
+ * Supports both Flask Backend API aggregated structures and Client-side fallback arrays.
  */
 
 const ChartsEngine = {
   instances: {},
 
-  /**
-   * Safe helper to destroy an existing chart instance
-   */
   destroy(id) {
     if (this.instances[id]) {
       this.instances[id].destroy();
@@ -16,9 +14,6 @@ const ChartsEngine = {
     }
   },
 
-  /**
-   * Global chart configuration defaults
-   */
   getDefaultOptions() {
     return {
       responsive: true,
@@ -78,17 +73,19 @@ const ChartsEngine = {
   },
 
   /**
-   * 1. Contact Period Response Rate Chart (Bar & Trend Line)
+   * 1. Contact Period Response Rate Chart
    */
-  renderPeriodChart(canvasId, records) {
+  renderPeriodChart(canvasId, input) {
     this.destroy(canvasId);
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
-    const periodData = AnalyticsEngine.computeByPeriod(records);
-    const labels = periodData.map(p => p.fullName);
+    const periodData = Array.isArray(input) && input.length > 0 && input[0].fullName
+      ? input
+      : AnalyticsEngine.computeByPeriod(input || []);
+
+    const labels = periodData.map(p => p.fullName || p.label);
     const rates = periodData.map(p => p.responseRate);
-    const volumes = periodData.map(p => p.total);
 
     const ctx = canvas.getContext('2d');
     const primaryGrad = ctx.createLinearGradient(0, 0, 0, 300);
@@ -133,10 +130,10 @@ const ChartsEngine = {
               afterBody(items) {
                 const idx = items[0].dataIndex;
                 const item = periodData[idx];
-                return [
+                return item ? [
                   `Total Outreach Volume: ${item.total} contacts`,
                   `Converted: ${item.converted} (${item.responseRate}%)`
-                ];
+                ] : [];
               }
             }
           }
@@ -147,9 +144,7 @@ const ChartsEngine = {
             beginAtZero: true,
             suggestedMax: 35,
             grid: { color: '#F1F5F9' },
-            ticks: {
-              callback: v => `${v}%`
-            }
+            ticks: { callback: v => `${v}%` }
           }
         }
       }
@@ -157,17 +152,19 @@ const ChartsEngine = {
   },
 
   /**
-   * 2. Communication Channel Response Rate Chart (Bar Chart)
+   * 2. Communication Channel Response Rate Chart
    */
-  renderChannelChart(canvasId, records) {
+  renderChannelChart(canvasId, input) {
     this.destroy(canvasId);
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
-    const channelData = AnalyticsEngine.computeByChannel(records);
+    const channelData = Array.isArray(input) && input.length > 0 && input[0].label && input[0].responseRate !== undefined
+      ? input
+      : AnalyticsEngine.computeByChannel(input || []);
+
     const labels = channelData.map(c => c.label);
     const rates = channelData.map(c => c.responseRate);
-
     const colors = ['#2563EB', '#10B981', '#64748B'];
 
     this.instances[canvasId] = new Chart(canvas, {
@@ -192,10 +189,10 @@ const ChartsEngine = {
               afterBody(items) {
                 const idx = items[0].dataIndex;
                 const item = channelData[idx];
-                return [
+                return item ? [
                   `Sample Size: N = ${item.total}`,
                   `Conversions: ${item.converted} / ${item.total}`
-                ];
+                ] : [];
               }
             }
           }
@@ -212,14 +209,17 @@ const ChartsEngine = {
   },
 
   /**
-   * 3. Response Rate by Number of Contacts (Marketing Fatigue Analysis)
+   * 3. Response Rate by Number of Contacts (Fatigue Analysis)
    */
-  renderFatigueChart(canvasId, records) {
+  renderFatigueChart(canvasId, input) {
     this.destroy(canvasId);
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
-    const fatigueData = AnalyticsEngine.computeByContacts(records);
+    const fatigueData = Array.isArray(input) && input.length > 0 && input[0].label && input[0].responseRate !== undefined
+      ? input
+      : AnalyticsEngine.computeByContacts(input || []);
+
     const labels = fatigueData.map(f => f.label);
     const rates = fatigueData.map(f => f.responseRate);
 
@@ -255,11 +255,11 @@ const ChartsEngine = {
               afterBody(items) {
                 const idx = items[0].dataIndex;
                 const item = fatigueData[idx];
-                return [
+                return item ? [
                   `Contact Volume: ${item.total} prospects`,
                   `Conversions: ${item.converted}`,
                   idx >= 3 ? '⚠️ Marketing Fatigue Zone' : '✅ Effective Engagement Window'
-                ];
+                ] : [];
               }
             }
           }
@@ -278,14 +278,17 @@ const ChartsEngine = {
   /**
    * 4. Outcome Distribution Doughnut Chart (Accepted vs Not Accepted)
    */
-  renderOutcomeChart(canvasId, centerMetricId, records) {
+  renderOutcomeChart(canvasId, centerMetricId, input) {
     this.destroy(canvasId);
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
-    const outcomeData = AnalyticsEngine.computeOutcomeDistribution(records);
+    const outcomeData = input && input.labels && input.counts
+      ? input
+      : AnalyticsEngine.computeOutcomeDistribution(input || []);
+
     const centerEl = document.getElementById(centerMetricId);
-    if (centerEl) {
+    if (centerEl && outcomeData.rates && outcomeData.rates.length > 0) {
       centerEl.textContent = `${outcomeData.rates[0]}%`;
     }
 
@@ -322,7 +325,7 @@ const ChartsEngine = {
             callbacks: {
               label(context) {
                 const val = context.parsed;
-                const total = outcomeData.total;
+                const total = outcomeData.total || 1;
                 const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
                 return `${context.label}: ${val.toLocaleString()} (${pct}%)`;
               }
@@ -334,14 +337,17 @@ const ChartsEngine = {
   },
 
   /**
-   * 5. Segment Comparison: Job Category Response Rates (Horizontal Bar Chart)
+   * 5. Segment Comparison: Job Category Response Rates
    */
-  renderJobSegmentChart(canvasId, records) {
+  renderJobSegmentChart(canvasId, input) {
     this.destroy(canvasId);
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
-    const jobData = AnalyticsEngine.computeByJob(records);
+    const jobData = Array.isArray(input) && input.length > 0 && input[0].label && input[0].responseRate !== undefined
+      ? input
+      : AnalyticsEngine.computeByJob(input || []);
+
     const labels = jobData.map(j => j.label);
     const rates = jobData.map(j => j.responseRate);
 
@@ -368,11 +374,11 @@ const ChartsEngine = {
               afterBody(items) {
                 const idx = items[0].dataIndex;
                 const item = jobData[idx];
-                return [
+                return item ? [
                   `Sample Size: N = ${item.total}`,
                   `Converted: ${item.converted}`,
-                  `Declined: ${item.declined}`
-                ];
+                  `Declined: ${item.declined || (item.total - item.converted)}`
+                ] : [];
               }
             }
           }
@@ -396,15 +402,16 @@ const ChartsEngine = {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
-    // Cross-tabulate Education x Housing Loan
     const educations = ['Primary', 'Secondary', 'Tertiary', 'Unknown'];
     const withHousingRates = [];
     const noHousingRates = [];
 
+    const recs = Array.isArray(records) ? records : [];
+
     educations.forEach(ed => {
       const edLow = ed.toLowerCase();
-      const withH = records.filter(r => (r.education || '').toLowerCase() === edLow && (r.housing || '').toLowerCase() === 'yes');
-      const noH = records.filter(r => (r.education || '').toLowerCase() === edLow && (r.housing || '').toLowerCase() === 'no');
+      const withH = recs.filter(r => (r.education || '').toLowerCase() === edLow && (r.housing || '').toLowerCase() === 'yes');
+      const noH = recs.filter(r => (r.education || '').toLowerCase() === edLow && (r.housing || '').toLowerCase() === 'no');
 
       withHousingRates.push(AnalyticsEngine.computeKPIs(withH).responseRate);
       noHousingRates.push(AnalyticsEngine.computeKPIs(noH).responseRate);
@@ -444,9 +451,6 @@ const ChartsEngine = {
     });
   },
 
-  /**
-   * Re-renders all active charts across views
-   */
   renderAll(records) {
     this.renderPeriodChart('chart-period', records);
     this.renderChannelChart('chart-channel', records);

@@ -682,6 +682,9 @@
               <button class="btn btn-outline" id="btn-print-report">
                 <i class="bi bi-printer"></i> Print / Save PDF
               </button>
+              <button class="btn btn-outline" id="btn-export-report-png">
+                <i class="bi bi-file-earmark-image"></i> Export Chart (PNG)
+              </button>
               <button class="btn btn-primary" id="btn-export-report-csv">
                 <i class="bi bi-file-earmark-spreadsheet"></i> Export Filtered CSV
               </button>
@@ -799,18 +802,18 @@
 
                 <div class="mb-3">
                   <label class="form-label small fw-semibold">Backend API Base URL</label>
-                  <input type="url" class="form-input" id="api-base-url" placeholder="http://localhost:8000/api/v1" value="http://localhost:8000/api/v1">
+                  <input type="url" class="form-input" id="api-base-url" placeholder="http://localhost:5000/api" value="http://localhost:5000/api">
                 </div>
 
                 <div class="mb-3">
-                  <label class="form-label small fw-semibold">API Authorization Token</label>
-                  <input type="password" class="form-input" id="api-key" placeholder="Bearer eyJhbGciOiJIUzI1NiIs..." value="demo_token_bank_bi_9921">
+                  <label class="form-label small fw-semibold">API Authorization Token (Optional)</label>
+                  <input type="password" class="form-input" id="api-key" placeholder="Bearer eyJhbGciOiJIUzI1NiIs..." value="bank_pulse_secret_token">
                 </div>
 
                 <div class="d-flex align-items-center justify-content-between pt-2">
-                  <span class="badge badge-neutral"><i class="bi bi-clock-history"></i> Polling: Off (Client BI)</span>
+                  <span class="badge badge-success"><i class="bi bi-broadcast"></i> REST API: Active</span>
                   <button class="btn btn-primary btn-sm" id="btn-save-api-config">
-                    <i class="bi bi-save"></i> Save Configuration
+                    <i class="bi bi-save"></i> Save & Test Connection
                   </button>
                 </div>
               </div>
@@ -819,23 +822,28 @@
             <!-- Expected REST Endpoints Documentation -->
             <div class="card">
               <div class="card-header">
-                <h2 class="card-title"><i class="bi bi-code-slash text-success"></i> Anticipated API Endpoints</h2>
+                <h2 class="card-title"><i class="bi bi-code-slash text-success"></i> Active Python Flask Endpoints</h2>
               </div>
               <div class="card-body">
                 <div class="mb-2">
                   <span class="badge badge-primary me-1">GET</span>
-                  <span class="api-endpoint-badge">/api/campaigns/analytics</span>
-                  <div class="text-muted small mt-1">Fetches aggregated KPIs and segment response distributions.</div>
+                  <span class="api-endpoint-badge">/api/dashboard</span>
+                  <div class="text-muted small mt-1">Fetches overall campaign KPIs, benchmark diffs, and outcome counts.</div>
                 </div>
                 <div class="mb-2 mt-3">
                   <span class="badge badge-success me-1">POST</span>
-                  <span class="api-endpoint-badge">/api/campaigns/upload</span>
-                  <div class="text-muted small mt-1">Multipart form upload of customer dataset CSV.</div>
+                  <span class="api-endpoint-badge">/api/upload</span>
+                  <div class="text-muted small mt-1">Validates and ingests CSV datasets into SQLite database.</div>
                 </div>
                 <div class="mb-2 mt-3">
-                  <span class="badge badge-info me-1">GET</span>
-                  <span class="api-endpoint-badge">/api/campaigns/insights</span>
-                  <div class="text-muted small mt-1">Fetches automated regression & clustering insights.</div>
+                  <span class="badge badge-primary me-1">GET</span>
+                  <span class="api-endpoint-badge">/api/analytics/period</span>
+                  <div class="text-muted small mt-1">Monthly outreach response rates and conversion volume.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-primary me-1">GET</span>
+                  <span class="api-endpoint-badge">/api/insights</span>
+                  <div class="text-muted small mt-1">Automated data-based observations and test recommendations.</div>
                 </div>
               </div>
             </div>
@@ -871,6 +879,7 @@
 
   <!-- Application Logic Modules -->
   <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
   <script src="assets/js/data/demoData.js"></script>
   <script src="assets/js/state.js"></script>
   <script src="assets/js/csvParser.js"></script>

@@ -1,6 +1,6 @@
 /**
  * Bank Marketing Campaign Analysis Dashboard
- * UI Orchestration, DOM Handlers, Toast Notifications & Table Interactions
+ * UI Orchestration, DOM Handlers, Toast Notifications, Table Interactions & API Binding
  */
 
 const UIEngine = {
@@ -84,7 +84,6 @@ const UIEngine = {
     if (quickMonth) {
       quickMonth.addEventListener('change', e => {
         appState.setFilter('month', e.target.value);
-        // Sync filter bar select as well
         const monthFilter = document.getElementById('filter-month');
         if (monthFilter) monthFilter.value = e.target.value;
       });
@@ -104,11 +103,10 @@ const UIEngine = {
         const val = e.target.value;
         searchTimer = setTimeout(() => {
           appState.setFilter('searchQuery', val);
-          // Sync other search input
           searchInputs.forEach(other => {
             if (other && other !== input) other.value = val;
           });
-        }, 250);
+        }, 300);
       });
     });
 
@@ -123,9 +121,6 @@ const UIEngine = {
     });
   },
 
-  /**
-   * Resets select dropdown values in DOM
-   */
   resetFilterFormValues() {
     const selects = ['filter-month', 'filter-job', 'filter-education', 'filter-contact', 'filter-outcome', 'filter-marital', 'filter-touches', 'topbar-quick-month'];
     selects.forEach(id => {
@@ -139,11 +134,7 @@ const UIEngine = {
     if (search2) search2.value = '';
   },
 
-  /**
-   * Table sorting and pagination event bindings
-   */
   bindTableEvents() {
-    // Sortable column headers
     const sortHeaders = document.querySelectorAll('th.sortable');
     sortHeaders.forEach(th => {
       th.addEventListener('click', () => {
@@ -154,7 +145,6 @@ const UIEngine = {
       });
     });
 
-    // Page size selector
     const pageSizeSelect = document.getElementById('table-page-size');
     if (pageSizeSelect) {
       pageSizeSelect.addEventListener('change', e => {
@@ -163,9 +153,6 @@ const UIEngine = {
     }
   },
 
-  /**
-   * CSV Upload Dropzone & File Picker bindings
-   */
   bindUploadEvents() {
     const dropzone = document.getElementById('upload-dropzone');
     const fileInput = document.getElementById('csv-file-input');
@@ -175,7 +162,6 @@ const UIEngine = {
     if (dropzone && fileInput) {
       dropzone.addEventListener('click', () => fileInput.click());
 
-      // Drag and drop visual cues
       ['dragenter', 'dragover'].forEach(eventName => {
         dropzone.addEventListener(eventName, e => {
           e.preventDefault();
@@ -214,8 +200,17 @@ const UIEngine = {
     }
 
     if (switchDemoBtn) {
-      switchDemoBtn.addEventListener('click', () => {
-        if (window.DEMO_CAMPAIGN_DATA) {
+      switchDemoBtn.addEventListener('click', async () => {
+        if (appState.state.backendConnected) {
+          this.showToast('Resetting Dataset', 'Requesting Flask API to restore benchmark cohort...', 'info');
+          const res = await ApiClient.resetDemo();
+          if (res.ok) {
+            await appState.syncWithBackend();
+            this.showToast('Benchmark Restored', 'Flask SQLite database restored to benchmark cohort.', 'success');
+          } else {
+            this.showToast('Reset Failed', res.error || 'Server error', 'danger');
+          }
+        } else if (window.DEMO_CAMPAIGN_DATA) {
           appState.setDataset(window.DEMO_CAMPAIGN_DATA, 'demo');
           this.showToast('Benchmark Cohort Loaded', 'Restored the 1,250 record pre-loaded benchmark campaign dataset.', 'info');
         }
@@ -224,20 +219,68 @@ const UIEngine = {
   },
 
   /**
-   * Processes uploaded file with schema verification
+   * Processes uploaded file with backend API validation or client fallback
    */
-  handleFileUpload(file) {
+  async handleFileUpload(file) {
     if (!file.name.toLowerCase().endsWith('.csv') && !file.type.includes('csv') && !file.type.includes('text')) {
       this.showToast('Invalid File Type', 'Please upload a comma-separated or semicolon-separated .csv file.', 'danger');
       return;
     }
 
+    const alertContainer = document.getElementById('upload-status-alert');
+
+    // 1. If Flask backend is connected, use backend validation and SQLite storage
+    if (appState.state.backendConnected) {
+      this.showToast('Validating Upload', `Uploading ${file.name} to Python Flask API...`, 'info');
+
+      const res = await ApiClient.uploadCsv(file);
+      if (!res.ok) {
+        const errMessage = res.data && res.data.error ? res.data.error : (res.error || 'Validation error');
+        if (alertContainer) {
+          alertContainer.innerHTML = `
+            <div class="card p-3 border-danger bg-danger-subtle">
+              <div class="d-flex align-items-center gap-2 text-danger fw-bold mb-1">
+                <i class="bi bi-exclamation-octagon-fill"></i> Backend Validation Failed
+              </div>
+              <div class="text-danger small">${errMessage}</div>
+            </div>
+          `;
+          alertContainer.style.display = 'block';
+        }
+        this.showToast('Validation Error', errMessage, 'danger');
+        return;
+      }
+
+      const stats = res.data.stats;
+      if (alertContainer) {
+        alertContainer.innerHTML = `
+          <div class="card p-3 border-success bg-success-subtle">
+            <div class="d-flex align-items-center gap-2 text-success fw-bold mb-1">
+              <i class="bi bi-check-circle-fill"></i> Dataset Verified & Stored in SQLite!
+            </div>
+            <div class="text-secondary small">
+              Parsed <strong>${(stats.validRowsParsed || 0).toLocaleString()}</strong> valid rows from <em>${file.name}</em> (Delimiter: <code>${stats.delimiter}</code>).
+              ${stats.duplicatesRemoved > 0 ? `<br><span class="text-warning">⚠️ Removed ${stats.duplicatesRemoved} duplicate records.</span>` : ''}
+            </div>
+          </div>
+        `;
+        alertContainer.style.display = 'block';
+      }
+
+      await appState.syncWithBackend();
+      this.showToast('Dataset Activated', `Successfully loaded ${(stats.validRowsParsed || 0).toLocaleString()} customer records from ${file.name}.`, 'success');
+
+      setTimeout(() => {
+        appState.setActiveView('dashboard');
+      }, 900);
+      return;
+    }
+
+    // 2. Client-side fallback if backend offline
     const reader = new FileReader();
     reader.onload = e => {
       const text = e.target.result;
       const parseResult = CSVEngine.parse(text);
-
-      const alertContainer = document.getElementById('upload-status-alert');
 
       if (!parseResult.success) {
         if (alertContainer) {
@@ -255,7 +298,6 @@ const UIEngine = {
         return;
       }
 
-      // Successful parse
       const { records, stats } = parseResult;
       appState.setDataset(records, 'upload', file.name);
 
@@ -276,7 +318,6 @@ const UIEngine = {
 
       this.showToast('Dataset Activated', `Successfully loaded ${stats.validRowsParsed.toLocaleString()} customer records from ${file.name}.`, 'success');
       
-      // Auto-switch to Dashboard after short delay
       setTimeout(() => {
         appState.setActiveView('dashboard');
       }, 900);
@@ -290,17 +331,36 @@ const UIEngine = {
   },
 
   /**
-   * Reports Actions: CSV Export and Print Layout
+   * Reports Actions: CSV Export, Matplotlib Chart Export, and Print Layout
    */
   bindReportActions() {
     const exportCsvBtn = document.getElementById('btn-export-report-csv');
+    const exportPngBtn = document.getElementById('btn-export-report-png');
     const printReportBtn = document.getElementById('btn-print-report');
 
     if (exportCsvBtn) {
       exportCsvBtn.addEventListener('click', () => {
-        const filtered = appState.getFilteredDataset();
-        CSVEngine.exportRecordsToCsv(filtered, `bank_campaign_report_${new Date().toISOString().slice(0, 10)}.csv`);
-        this.showToast('CSV Export Ready', `Exported ${filtered.length.toLocaleString()} campaign records to CSV.`, 'success');
+        if (appState.state.backendConnected) {
+          const exportUrl = ApiClient.getExportUrl(appState.state.filters, 'csv');
+          window.open(exportUrl, '_blank');
+          this.showToast('CSV Download Started', 'Downloading filtered report from Python API...', 'success');
+        } else {
+          const filtered = appState.getFilteredDataset();
+          CSVEngine.exportRecordsToCsv(filtered, `bank_campaign_report_${new Date().toISOString().slice(0, 10)}.csv`);
+          this.showToast('CSV Export Ready', `Exported ${filtered.length.toLocaleString()} campaign records to CSV.`, 'success');
+        }
+      });
+    }
+
+    if (exportPngBtn) {
+      exportPngBtn.addEventListener('click', () => {
+        if (appState.state.backendConnected) {
+          const exportUrl = ApiClient.getExportUrl(appState.state.filters, 'png');
+          window.open(exportUrl, '_blank');
+          this.showToast('Chart Export Started', 'Downloading Matplotlib analytical chart PNG...', 'success');
+        } else {
+          this.showToast('Feature Unavailable Offline', 'Please connect the Flask backend to generate high-res Matplotlib chart images.', 'warning');
+        }
       });
     }
 
@@ -311,23 +371,38 @@ const UIEngine = {
     }
   },
 
-  /**
-   * Settings page handlers
-   */
   bindSettings() {
+    const apiUrlInput = document.getElementById('api-base-url');
+    if (apiUrlInput) {
+      apiUrlInput.value = ApiClient.getBaseUrl();
+    }
+
     const saveApiBtn = document.getElementById('btn-save-api-config');
     if (saveApiBtn) {
-      saveApiBtn.addEventListener('click', e => {
+      saveApiBtn.addEventListener('click', async e => {
         e.preventDefault();
-        this.showToast('Settings Saved', 'REST API configuration updated for future backend connection.', 'success');
+        const newUrl = apiUrlInput ? apiUrlInput.value.trim() : '';
+        ApiClient.setBaseUrl(newUrl);
+        this.showToast('Testing Connection', `Connecting to ${newUrl}...`, 'info');
+
+        const connected = await appState.checkBackendConnection();
+        if (connected) {
+          this.showToast('API Connected', 'Flask REST backend is online and synchronized!', 'success');
+        } else {
+          this.showToast('Connection Warning', 'Unable to reach backend at specified URL. Using client-side fallback mode.', 'warning');
+        }
+        UIEngine.updateHeaderIndicators(appState.state);
       });
     }
 
     const resetAllBtn = document.getElementById('btn-reset-everything');
     if (resetAllBtn) {
-      resetAllBtn.addEventListener('click', () => {
+      resetAllBtn.addEventListener('click', async () => {
         if (confirm('Are you sure you want to restore the default benchmark dataset and reset all filters?')) {
-          if (window.DEMO_CAMPAIGN_DATA) {
+          if (appState.state.backendConnected) {
+            await ApiClient.resetDemo();
+            await appState.syncWithBackend();
+          } else if (window.DEMO_CAMPAIGN_DATA) {
             appState.setDataset(window.DEMO_CAMPAIGN_DATA, 'demo');
           }
           this.resetFilterFormValues();
@@ -337,9 +412,6 @@ const UIEngine = {
     }
   },
 
-  /**
-   * Updates Topbar indicators (Active Dataset, Filter Badge)
-   */
   updateHeaderIndicators(state) {
     const badgeText = document.getElementById('active-dataset-text');
     const pillContainer = document.querySelector('.active-dataset-indicator');
@@ -356,39 +428,49 @@ const UIEngine = {
       }
     }
 
-    // Filter count badge in filter bar
     const filterCounter = document.getElementById('active-filter-count');
     const activeCount = appState.getActiveFilterCount();
     if (filterCounter) {
       filterCounter.textContent = activeCount > 0 ? `${activeCount} Active` : 'All Data';
       filterCounter.className = activeCount > 0 ? 'filter-badge-counter bg-primary text-white' : 'filter-badge-counter';
     }
+
+    // Backend status indicators in sidebar footer
+    const statusLabel = document.querySelector('.status-label');
+    const statusSub = document.querySelector('.status-sub');
+    const statusDot = document.querySelector('.status-dot-pulse');
+
+    if (statusLabel && statusSub) {
+      if (state.backendConnected) {
+        statusLabel.textContent = 'Flask API Online';
+        statusSub.textContent = 'SQLite & Pandas Active';
+        if (statusDot) statusDot.style.backgroundColor = '#10B981';
+      } else {
+        statusLabel.textContent = 'Client-Side Mode';
+        statusSub.textContent = 'In-Memory Engine Active';
+        if (statusDot) statusDot.style.backgroundColor = '#3B82F6';
+      }
+    }
   },
 
-  /**
-   * Updates All KPI Cards in the UI
-   */
   updateKPIs(kpis) {
-    // Total Customers
+    if (!kpis) return;
+
     const elCustomers = document.querySelectorAll('.kpi-val-customers');
-    elCustomers.forEach(el => el.textContent = kpis.totalCustomers.toLocaleString());
+    elCustomers.forEach(el => el.textContent = (kpis.totalCustomers || 0).toLocaleString());
 
-    // Total Contacts
     const elContacts = document.querySelectorAll('.kpi-val-contacts');
-    elContacts.forEach(el => el.textContent = kpis.totalContacts.toLocaleString());
+    elContacts.forEach(el => el.textContent = (kpis.totalContacts || 0).toLocaleString());
 
-    // Successful Responses
     const elSuccess = document.querySelectorAll('.kpi-val-success');
-    elSuccess.forEach(el => el.textContent = kpis.successfulResponses.toLocaleString());
+    elSuccess.forEach(el => el.textContent = (kpis.successfulResponses || 0).toLocaleString());
 
-    // Overall Response Rate
     const elRate = document.querySelectorAll('.kpi-val-rate');
-    elRate.forEach(el => el.textContent = `${kpis.responseRate}%`);
+    elRate.forEach(el => el.textContent = `${kpis.responseRate || 0}%`);
 
-    // Trend vs Benchmark
     const elTrends = document.querySelectorAll('.kpi-trend-benchmark');
     elTrends.forEach(el => {
-      const diff = kpis.benchmarkDiff;
+      const diff = kpis.benchmarkDiff !== undefined ? kpis.benchmarkDiff : 0;
       if (diff > 0) {
         el.className = 'kpi-trend positive';
         el.innerHTML = `<i class="bi bi-arrow-up-right"></i> +${diff}% vs Benchmark`;
@@ -401,24 +483,20 @@ const UIEngine = {
       }
     });
 
-    // Secondary metrics
     const elUnsuccessful = document.getElementById('kpi-val-unsuccessful');
-    if (elUnsuccessful) elUnsuccessful.textContent = kpis.unsuccessfulResponses.toLocaleString();
+    if (elUnsuccessful) elUnsuccessful.textContent = (kpis.unsuccessfulResponses || 0).toLocaleString();
 
     const elAvgDuration = document.getElementById('kpi-val-duration');
     if (elAvgDuration) {
-      const mins = Math.floor(kpis.avgDurationSeconds / 60);
-      const secs = kpis.avgDurationSeconds % 60;
-      elAvgDuration.textContent = `${mins}m ${secs}s`;
+      const secs = kpis.avgDurationSeconds || 0;
+      const mins = Math.floor(secs / 60);
+      elAvgDuration.textContent = `${mins}m ${secs % 60}s`;
     }
 
     const elPrevSuccess = document.getElementById('kpi-val-prev-success');
-    if (elPrevSuccess) elPrevSuccess.textContent = `${kpis.previousSuccessRate}%`;
+    if (elPrevSuccess) elPrevSuccess.textContent = `${kpis.previousSuccessRate || 0}%`;
   },
 
-  /**
-   * Renders Dynamic Campaign Insight Cards
-   */
   renderInsights(insights) {
     const container = document.getElementById('insights-container');
     if (!container) return;
@@ -457,72 +535,105 @@ const UIEngine = {
     `).join('');
   },
 
-  /**
-   * Renders Customer Segments View Breakdown Bars
-   */
-  renderCustomerSegments(records) {
+  renderCustomerSegments(segmentsOrRecords) {
     const jobBarsContainer = document.getElementById('segment-job-bars');
     const ageBarsContainer = document.getElementById('segment-age-bars');
 
-    if (jobBarsContainer) {
-      const jobData = AnalyticsEngine.computeByJob(records);
-      const maxRate = Math.max(...jobData.map(j => j.responseRate), 1);
-
-      jobBarsContainer.innerHTML = jobData.map(j => {
-        const widthPct = Math.min(100, Math.round((j.responseRate / maxRate) * 100));
-        return `
-          <div class="segment-bar-row">
-            <div class="segment-name" title="${j.label}">${j.label}</div>
-            <div class="segment-track">
-              <div class="segment-fill" style="width: ${widthPct}%;"></div>
+    // If backend segments object passed
+    if (segmentsOrRecords && segmentsOrRecords.jobs && segmentsOrRecords.ages) {
+      if (jobBarsContainer) {
+        const jobData = segmentsOrRecords.jobs;
+        const maxRate = Math.max(...jobData.map(j => j.responseRate), 1);
+        jobBarsContainer.innerHTML = jobData.map(j => {
+          const widthPct = Math.min(100, Math.round((j.responseRate / maxRate) * 100));
+          return `
+            <div class="segment-bar-row">
+              <div class="segment-name" title="${j.label}">${j.label}</div>
+              <div class="segment-track">
+                <div class="segment-fill" style="width: ${widthPct}%;"></div>
+              </div>
+              <div class="segment-rate">${j.responseRate}%</div>
+              <div class="segment-count">(N=${j.total})</div>
             </div>
-            <div class="segment-rate">${j.responseRate}%</div>
-            <div class="segment-count">(N=${j.total})</div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
+
+      if (ageBarsContainer) {
+        const ageData = segmentsOrRecords.ages;
+        const maxAgeRate = Math.max(...ageData.map(a => a.responseRate), 1);
+        ageBarsContainer.innerHTML = ageData.map(a => {
+          const widthPct = Math.min(100, Math.round((a.responseRate / maxAgeRate) * 100));
+          return `
+            <div class="segment-bar-row">
+              <div class="segment-name">${a.label}</div>
+              <div class="segment-track">
+                <div class="segment-fill" style="width: ${widthPct}%; background: linear-gradient(90deg, #10B981, #059669);"></div>
+              </div>
+              <div class="segment-rate">${a.responseRate}%</div>
+              <div class="segment-count">(N=${a.total})</div>
+            </div>
+          `;
+        }).join('');
+      }
+      return;
     }
 
-    if (ageBarsContainer) {
-      const ageData = AnalyticsEngine.computeByAgeBracket(records);
-      const maxAgeRate = Math.max(...ageData.map(a => a.responseRate), 1);
-
-      ageBarsContainer.innerHTML = ageData.map(a => {
-        const widthPct = Math.min(100, Math.round((a.responseRate / maxAgeRate) * 100));
-        return `
-          <div class="segment-bar-row">
-            <div class="segment-name">${a.label}</div>
-            <div class="segment-track">
-              <div class="segment-fill" style="width: ${widthPct}%; background: linear-gradient(90deg, #10B981, #059669);"></div>
+    // Client-side fallback
+    if (Array.isArray(segmentsOrRecords)) {
+      if (jobBarsContainer) {
+        const jobData = AnalyticsEngine.computeByJob(segmentsOrRecords);
+        const maxRate = Math.max(...jobData.map(j => j.responseRate), 1);
+        jobBarsContainer.innerHTML = jobData.map(j => {
+          const widthPct = Math.min(100, Math.round((j.responseRate / maxRate) * 100));
+          return `
+            <div class="segment-bar-row">
+              <div class="segment-name" title="${j.label}">${j.label}</div>
+              <div class="segment-track">
+                <div class="segment-fill" style="width: ${widthPct}%;"></div>
+              </div>
+              <div class="segment-rate">${j.responseRate}%</div>
+              <div class="segment-count">(N=${j.total})</div>
             </div>
-            <div class="segment-rate">${a.responseRate}%</div>
-            <div class="segment-count">(N=${a.total})</div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
+      }
+
+      if (ageBarsContainer) {
+        const ageData = AnalyticsEngine.computeByAgeBracket(segmentsOrRecords);
+        const maxAgeRate = Math.max(...ageData.map(a => a.responseRate), 1);
+        ageBarsContainer.innerHTML = ageData.map(a => {
+          const widthPct = Math.min(100, Math.round((a.responseRate / maxAgeRate) * 100));
+          return `
+            <div class="segment-bar-row">
+              <div class="segment-name">${a.label}</div>
+              <div class="segment-track">
+                <div class="segment-fill" style="width: ${widthPct}%; background: linear-gradient(90deg, #10B981, #059669);"></div>
+              </div>
+              <div class="segment-rate">${a.responseRate}%</div>
+              <div class="segment-count">(N=${a.total})</div>
+            </div>
+          `;
+        }).join('');
+      }
     }
   },
 
-  /**
-   * Renders Data Table Rows & Pagination Controls
-   */
   renderTable() {
     const tbody = document.getElementById('dataset-table-body');
     const paginationContainer = document.getElementById('table-pagination-controls');
     const tableInfo = document.getElementById('table-entry-info');
     if (!tbody) return;
 
-    const { records, totalRecords, totalPages, currentPage, pageSize, startIndex, endIndex } = appState.getPaginatedTableData();
+    const { records, totalRecords, totalPages, currentPage, startIndex, endIndex } = appState.getPaginatedTableData();
 
-    // Table entries range label
     if (tableInfo) {
       tableInfo.textContent = totalRecords > 0
         ? `Showing ${startIndex + 1} to ${endIndex} of ${totalRecords.toLocaleString()} entries`
         : 'Showing 0 entries';
     }
 
-    // Empty state
-    if (records.length === 0) {
+    if (!records || records.length === 0) {
       tbody.innerHTML = `
         <tr>
           <td colspan="10" class="text-center py-5">
@@ -541,7 +652,6 @@ const UIEngine = {
       return;
     }
 
-    // Render table rows
     tbody.innerHTML = records.map(r => {
       const isYes = (r.y || '').toLowerCase() === 'yes';
       const outcomeBadge = isYes
@@ -564,7 +674,6 @@ const UIEngine = {
       `;
     }).join('');
 
-    // Update Sorting UI Icons on headers
     const { sortColumn, sortDirection } = appState.state.table;
     document.querySelectorAll('th.sortable').forEach(th => {
       const col = th.getAttribute('data-sort');
@@ -580,11 +689,8 @@ const UIEngine = {
       }
     });
 
-    // Render pagination buttons
     if (paginationContainer) {
       paginationContainer.innerHTML = this.buildPaginationHtml(currentPage, totalPages);
-
-      // Bind click events on page buttons
       paginationContainer.querySelectorAll('[data-page]').forEach(btn => {
         btn.addEventListener('click', e => {
           e.preventDefault();
@@ -597,9 +703,6 @@ const UIEngine = {
     }
   },
 
-  /**
-   * Builds clean pagination numbered buttons with ellipsis
-   */
   buildPaginationHtml(current, total) {
     if (total <= 1) return '';
 
@@ -613,7 +716,6 @@ const UIEngine = {
       </button>
     `;
 
-    // Smart pagination algorithm
     if (total <= 7) {
       for (let i = 1; i <= total; i++) pages.push(i);
     } else {
@@ -644,9 +746,6 @@ const UIEngine = {
     return html;
   },
 
-  /**
-   * Updates Executive Report View Meta
-   */
   updateReportView(state, kpis) {
     const reportDatasetName = document.getElementById('report-meta-dataset');
     const reportDate = document.getElementById('report-meta-date');
@@ -663,9 +762,6 @@ const UIEngine = {
     }
   },
 
-  /**
-   * Floating Toast Notification
-   */
   showToast(title, message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -694,7 +790,6 @@ const UIEngine = {
 
     container.appendChild(toast);
 
-    // Auto dismiss after 4 seconds
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(10px)';

@@ -80,25 +80,26 @@ Bank-Marketing-campaign-analysis/
 
 ## 🚀 How to Run Locally
 
-You can run the dashboard locally with any static web server:
+### Option A: Using NPM (Recommended)
+Simply run:
+```bash
+npm run dev
+```
+or
+```bash
+npm start
+```
+This automatically starts the local server and **opens the dashboard directly in your default browser** at `http://localhost:3000`.
 
-### Option A: Using Python (Recommended)
-In PowerShell or terminal, navigate to the project directory and run:
+### Option B: Using Python
+In PowerShell or terminal, run:
 ```bash
 python -m http.server 8080
 ```
-Open your browser and navigate to:
-```
-http://localhost:8080
-```
+Then open your browser to `http://localhost:8080`.
 
-### Option B: Using Node.js / npx
-```bash
-npx serve -l 8080
-```
-
-### Option C: Direct Browser Open
-Double-click `index.html` to open it directly in any modern browser (Chrome, Edge, Firefox, Safari).
+### Option C: Direct File Open
+Double-click [index.html](file:///c:/Users/devang/OneDrive/desktop/bank/Bank-Marketing-campaign-analysis/index.html) to open it directly in any modern browser.
 
 ---
 

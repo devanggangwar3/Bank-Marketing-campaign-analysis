@@ -1,0 +1,20 @@
+{
+  "name": "bank-marketing-campaign-analysis",
+  "version": "1.0.0",
+  "description": "Bank Marketing Campaign Analysis Dashboard - Business Intelligence frontend for campaign response rates, contact fatigue analytics, and customer segmentation.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "serve": "npx serve -l 3000"
+  },
+  "keywords": [
+    "bank-marketing",
+    "campaign-analysis",
+    "dashboard",
+    "business-intelligence",
+    "chartjs"
+  ],
+  "author": "BankPulse Analytics",
+  "license": "MIT"
+}

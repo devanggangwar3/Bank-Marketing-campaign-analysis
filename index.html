@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bank Marketing Campaign Analysis Dashboard - Business intelligence frontend for analyzing campaign performance, customer response rates, demographic segments, and marketing fatigue patterns.">
+  <meta name="author" content="BankPulse Analytics">
+  <title>Bank Marketing Campaign Analysis Dashboard | Business Intelligence</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons 1.11.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Application Custom Stylesheets -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body>
+
+  <!-- Application Shell -->
+  <div class="app-container">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop"></div>
+
+    <!-- 1. Left Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="#dashboard" class="brand-wrapper" data-view-target="dashboard">
+          <div class="brand-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">BankPulse BI</span>
+            <span class="brand-subtitle">Marketing Intelligence</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Campaign Analysis</div>
+        <a class="sidebar-nav-link active" data-view-target="dashboard" id="nav-dashboard">
+          <i class="bi bi-grid-1x2-fill"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="sidebar-nav-link" data-view-target="analytics" id="nav-analytics">
+          <i class="bi bi-bar-chart-line-fill"></i>
+          <span>Campaign Analytics</span>
+        </a>
+        <a class="sidebar-nav-link" data-view-target="segments" id="nav-segments">
+          <i class="bi bi-people-fill"></i>
+          <span>Customer Segments</span>
+        </a>
+
+        <div class="nav-section-title mt-3">Data Operations</div>
+        <a class="sidebar-nav-link" data-view-target="upload" id="nav-upload">
+          <i class="bi bi-cloud-arrow-up-fill"></i>
+          <span>Upload Dataset</span>
+          <span class="sidebar-nav-badge badge-primary">CSV</span>
+        </a>
+        <a class="sidebar-nav-link" data-view-target="reports" id="nav-reports">
+          <i class="bi bi-file-earmark-text-fill"></i>
+          <span>Executive Reports</span>
+          <span class="sidebar-nav-badge badge-success">Export</span>
+        </a>
+
+        <div class="nav-section-title mt-3">System</div>
+        <a class="sidebar-nav-link" data-view-target="settings" id="nav-settings">
+          <i class="bi bi-gear-fill"></i>
+          <span>Settings & API</span>
+        </a>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="system-status-card">
+          <div class="status-dot-pulse"></div>
+          <div class="status-info">
+            <span class="status-label">Analytics Engine</span>
+            <span class="status-sub">In-Memory BI Active</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. Main Wrapper (Top Navigation & Views) -->
+    <div class="main-wrapper">
+
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-nav-toggle" id="mobile-drawer-toggle" aria-label="Toggle Navigation Drawer">
+            <i class="bi bi-list"></i>
+          </button>
+          
+          <!-- Active Data Source Badge -->
+          <div class="active-dataset-indicator" id="topbar-active-dataset" title="Currently active campaign cohort">
+            <i class="bi bi-database-check text-primary"></i>
+            <span class="source-badge">Active Dataset</span>
+            <span class="dataset-name-text text-truncate" id="active-dataset-text" style="max-width: 280px;">Benchmark Cohort (1,250 records)</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Quick Month Dropdown -->
+          <div class="d-none d-md-flex align-items-center gap-2">
+            <label for="topbar-quick-month" class="small text-muted fw-semibold mb-0">Period:</label>
+            <select class="quick-date-filter" id="topbar-quick-month" aria-label="Quick Period Selector">
+              <option value="all">Full Year (All Months)</option>
+              <option value="jan">January</option>
+              <option value="feb">February</option>
+              <option value="mar">March</option>
+              <option value="apr">April</option>
+              <option value="may">May</option>
+              <option value="jun">June</option>
+              <option value="jul">July</option>
+              <option value="aug">August</option>
+              <option value="sep">September</option>
+              <option value="oct">October</option>
+              <option value="nov">November</option>
+              <option value="dec">December</option>
+            </select>
+          </div>
+
+          <!-- User Profile -->
+          <div class="user-profile-btn" title="Logged in as Marketing Analytics Lead">
+            <div class="user-avatar">MK</div>
+            <div class="user-details">
+              <span class="user-name">Marketing Lead</span>
+              <span class="user-role">Analytics & Growth</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area with Multi-View Pages -->
+      <main class="content-area">
+
+        <!-- Print-Only Executive Header -->
+        <div class="print-only-header d-none">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="print-brand">BankPulse Business Intelligence</div>
+              <div class="print-meta">Executive Campaign Performance & Marketing Conversion Report</div>
+            </div>
+            <div class="text-end print-meta">
+              <div><strong>Dataset:</strong> <span id="print-dataset-meta">Bank Marketing Benchmark</span></div>
+              <div><strong>Generated:</strong> <span id="print-date-meta"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             PAGE VIEW 1: DASHBOARD (PRIMARY OVERVIEW)
+             =================================================================== -->
+        <section class="page-view active-view" id="view-dashboard">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Bank Marketing Campaign Dashboard</h1>
+              <p>Real-time campaign performance analytics, response rate calculations, and customer cohort comparisons.</p>
+            </div>
+            <div class="view-actions-group">
+              <button class="btn btn-outline" id="btn-download-sample-csv" title="Download template CSV for campaign analysis">
+                <i class="bi bi-download"></i> Sample CSV Template
+              </button>
+              <button class="btn btn-primary" data-view-target="upload">
+                <i class="bi bi-cloud-arrow-up"></i> Upload Campaign Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Universal Campaign Filter Bar -->
+          <div class="filter-bar-card">
+            <div class="filter-bar-header">
+              <div class="filter-title">
+                <i class="bi bi-funnel-fill text-primary"></i>
+                <span>Campaign Filters & Segment Slicers</span>
+                <span class="filter-badge-counter" id="active-filter-count">All Data</span>
+              </div>
+              <button class="btn btn-sm btn-outline btn-reset-filters">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset Filters
+              </button>
+            </div>
+
+            <div class="filter-grid">
+              <div class="filter-field">
+                <label class="filter-label" for="filter-month">Outreach Month</label>
+                <select class="form-select" id="filter-month">
+                  <option value="all">All Months</option>
+                  <option value="jan">January</option>
+                  <option value="feb">February</option>
+                  <option value="mar">March</option>
+                  <option value="apr">April</option>
+                  <option value="may">May</option>
+                  <option value="jun">June</option>
+                  <option value="jul">July</option>
+                  <option value="aug">August</option>
+                  <option value="sep">September</option>
+                  <option value="oct">October</option>
+                  <option value="nov">November</option>
+                  <option value="dec">December</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-job">Customer Job Category</label>
+                <select class="form-select" id="filter-job">
+                  <option value="all">All Occupations</option>
+                  <option value="management">Management</option>
+                  <option value="technician">Technician</option>
+                  <option value="blue-collar">Blue-Collar</option>
+                  <option value="admin.">Administrative</option>
+                  <option value="services">Services</option>
+                  <option value="retired">Retired</option>
+                  <option value="self-employed">Self-Employed</option>
+                  <option value="student">Student</option>
+                  <option value="unemployed">Unemployed</option>
+                  <option value="housemaid">Housemaid</option>
+                  <option value="entrepreneur">Entrepreneur</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-education">Education Level</label>
+                <select class="form-select" id="filter-education">
+                  <option value="all">All Education Levels</option>
+                  <option value="tertiary">Tertiary (University)</option>
+                  <option value="secondary">Secondary (High School)</option>
+                  <option value="primary">Primary</option>
+                  <option value="unknown">Unknown</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-contact">Contact Channel</label>
+                <select class="form-select" id="filter-contact">
+                  <option value="all">All Channels</option>
+                  <option value="cellular">Cellular Mobile</option>
+                  <option value="telephone">Fixed Landline</option>
+                  <option value="unknown">Unknown</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-outcome">Campaign Outcome</label>
+                <select class="form-select" id="filter-outcome">
+                  <option value="all">All Outcomes</option>
+                  <option value="yes">Subscribed (Yes)</option>
+                  <option value="no">Declined (No)</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-touches">Campaign Contacts</label>
+                <select class="form-select" id="filter-touches">
+                  <option value="all">All Touch Counts</option>
+                  <option value="1">1 Contact Touch</option>
+                  <option value="2">2 Contact Touches</option>
+                  <option value="3">3 Contact Touches</option>
+                  <option value="4+">4+ Contacts (Fatigue Risk)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Executive KPI Grid -->
+          <div class="kpi-grid">
+            <!-- KPI 1: Total Customers -->
+            <div class="kpi-card accent-primary">
+              <div class="kpi-header">
+                <span class="kpi-label">Total Customers</span>
+                <div class="kpi-icon-wrap">
+                  <i class="bi bi-people-fill"></i>
+                </div>
+              </div>
+              <div class="kpi-value kpi-val-customers">--</div>
+              <div class="kpi-footer">
+                <span>Unique targeted prospects</span>
+                <span class="kpi-trend neutral"><i class="bi bi-check2"></i> 100% Cohort</span>
+              </div>
+            </div>
+
+            <!-- KPI 2: Total Campaign Contacts -->
+            <div class="kpi-card accent-info">
+              <div class="kpi-header">
+                <span class="kpi-label">Campaign Contacts</span>
+                <div class="kpi-icon-wrap">
+                  <i class="bi bi-telephone-outbound-fill"></i>
+                </div>
+              </div>
+              <div class="kpi-value kpi-val-contacts">--</div>
+              <div class="kpi-footer">
+                <span>Total outreach touches</span>
+                <span class="kpi-trend neutral">Dialer Outreach</span>
+              </div>
+            </div>
+
+            <!-- KPI 3: Successful Responses (Conversions) -->
+            <div class="kpi-card accent-success">
+              <div class="kpi-header">
+                <span class="kpi-label">Successful Responses</span>
+                <div class="kpi-icon-wrap">
+                  <i class="bi bi-check-circle-fill"></i>
+                </div>
+              </div>
+              <div class="kpi-value kpi-val-success">--</div>
+              <div class="kpi-footer">
+                <span>Accepted term deposit</span>
+                <span class="kpi-trend positive"><i class="bi bi-shield-check"></i> Subscribed</span>
+              </div>
+            </div>
+
+            <!-- KPI 4: Overall Response Rate -->
+            <div class="kpi-card accent-warning">
+              <div class="kpi-header">
+                <span class="kpi-label">Overall Response Rate</span>
+                <div class="kpi-icon-wrap">
+                  <i class="bi bi-pie-chart-fill"></i>
+                </div>
+              </div>
+              <div class="kpi-value kpi-val-rate">--%</div>
+              <div class="kpi-footer">
+                <span>Target: 11.5%</span>
+                <span class="kpi-trend kpi-trend-benchmark">-- vs Benchmark</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 1: Period Performance & Outcome Doughnut -->
+          <div class="charts-grid-two-col">
+            <!-- Contact Period Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><i class="bi bi-calendar3 text-primary"></i> Response Rates by Contact Period</h2>
+                  <div class="card-subtitle">Monthly conversion percentage against the 11.5% industry target benchmark</div>
+                </div>
+                <span class="badge badge-info">Chronological</span>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chart-period"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Outcome Distribution Doughnut -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><i class="bi bi-pie-chart text-success"></i> Campaign Outcomes</h2>
+                  <div class="card-subtitle">Accepted vs Declined deposit subscriptions</div>
+                </div>
+              </div>
+              <div class="card-body doughnut-wrapper">
+                <div class="chart-container compact">
+                  <canvas id="chart-outcome"></canvas>
+                </div>
+                <div class="doughnut-center-metric">
+                  <div class="doughnut-center-number" id="doughnut-center-rate">--%</div>
+                  <div class="doughnut-center-label">Conversion</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Automated Campaign Insights -->
+          <div class="mt-4 mb-3 d-flex align-items-center justify-content-between">
+            <div>
+              <h2 class="h5 fw-bold text-navy-950 mb-1">
+                <i class="bi bi-lightbulb-fill text-warning"></i> Automated Campaign Insights & Observations to Test
+              </h2>
+              <p class="text-secondary small mb-0">
+                Data-driven segment discoveries with sample sizes (N) formulated as actionable hypotheses to test in upcoming campaign iterations.
+              </p>
+            </div>
+          </div>
+
+          <!-- Insights Grid (Populated dynamically) -->
+          <div class="insights-grid" id="insights-container">
+            <!-- Dynamic insight cards will be injected here -->
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW 2: CAMPAIGN ANALYTICS (DEEP DIVE & FATIGUE)
+             =================================================================== -->
+        <section class="page-view" id="view-analytics">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Campaign Outreach & Fatigue Analytics</h1>
+              <p>Analyze response rates across communication channels, outreach volume, and contact fatigue drop-offs.</p>
+            </div>
+          </div>
+
+          <!-- Secondary Metric Counters -->
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-3">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Unsuccessful Responses</div>
+                <div class="fs-3 fw-bold text-navy-950 mt-1" id="kpi-val-unsuccessful">--</div>
+                <div class="text-muted small mt-1">Declined or no contact</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Avg Call Duration</div>
+                <div class="fs-3 fw-bold text-navy-950 mt-1" id="kpi-val-duration">--</div>
+                <div class="text-muted small mt-1">Conversational length</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Prior Campaign Success</div>
+                <div class="fs-3 fw-bold text-navy-950 mt-1" id="kpi-val-prev-success">--%</div>
+                <div class="text-muted small mt-1">Repeat conversion rate</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Target Benchmark</div>
+                <div class="fs-3 fw-bold text-primary mt-1">11.5%</div>
+                <div class="text-muted small mt-1">Retail banking standard</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fatigue & Channel Charts -->
+          <div class="charts-grid-equal-two">
+            <!-- Contact Fatigue Decay Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><i class="bi bi-graph-down text-danger"></i> Contact Fatigue Analysis</h2>
+                  <div class="card-subtitle">Response rate decay as campaign contact attempts increase</div>
+                </div>
+                <span class="badge badge-warning">Optimization</span>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chart-fatigue"></canvas>
+                </div>
+              </div>
+              <div class="card-footer small text-secondary">
+                <i class="bi bi-info-circle text-primary"></i> <strong>Takeaway:</strong> Conversion rates typically drop sharply after 3 contacts. Prospects contacted 4+ times yield diminished returns.
+              </div>
+            </div>
+
+            <!-- Communication Channel Comparison -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><i class="bi bi-phone text-primary"></i> Response Rate by Contact Channel</h2>
+                  <div class="card-subtitle">Effectiveness comparison between Cellular and Fixed Telephone</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="chart-channel"></canvas>
+                </div>
+              </div>
+              <div class="card-footer small text-secondary">
+                <i class="bi bi-check-circle text-success"></i> <strong>Takeaway:</strong> Cellular outreach consistently demonstrates higher pick-up rates and greater receptivity than fixed landlines.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW 3: CUSTOMER SEGMENTS (DEMOGRAPHIC COMPARISONS)
+             =================================================================== -->
+        <section class="page-view" id="view-segments">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Customer Demographic & Financial Segments</h1>
+              <p>Compare customer propensities by job category, education level, age groups, and existing loan obligations.</p>
+            </div>
+          </div>
+
+          <div class="charts-grid-two-col mb-4">
+            <!-- Job Segments Horizontal Bar Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><i class="bi bi-briefcase text-primary"></i> Response Rate by Occupation</h2>
+                  <div class="card-subtitle">Ranked conversion rates across customer employment categories</div>
+                </div>
+                <span class="badge badge-neutral">Ranked</span>
+              </div>
+              <div class="card-body">
+                <div class="chart-container tall">
+                  <canvas id="chart-job-segments"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Education & Housing Loan Propensity -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h2 class="card-title"><i class="bi bi-mortarboard text-success"></i> Education & Housing Debt</h2>
+                  <div class="card-subtitle">Comparison of conversion rates with and without existing mortgages</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container tall">
+                  <canvas id="chart-education-housing"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Demographic Distribution Progress Bars -->
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <div class="card h-100">
+                <div class="card-header">
+                  <h2 class="card-title"><i class="bi bi-bar-chart-steps text-primary"></i> Occupational Segment Index</h2>
+                </div>
+                <div class="card-body" id="segment-job-bars">
+                  <!-- Populated dynamically with segment rows -->
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="card h-100">
+                <div class="card-header">
+                  <h2 class="card-title"><i class="bi bi-calendar2-range text-success"></i> Age Cohort Conversion Rates</h2>
+                </div>
+                <div class="card-body" id="segment-age-bars">
+                  <!-- Populated dynamically with age rows -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW 4: DATA UPLOAD & DATASET BROWSER
+             =================================================================== -->
+        <section class="page-view" id="view-upload">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Campaign Dataset Management & Ingestion</h1>
+              <p>Upload your bank marketing CSV file or browse, search, and sort the active analyzed records.</p>
+            </div>
+            <div class="view-actions-group">
+              <button class="btn btn-secondary" id="btn-switch-to-demo">
+                <i class="bi bi-arrow-repeat"></i> Reload Demo Benchmark Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Upload Dropzone Card -->
+          <div class="card mb-4">
+            <div class="card-body p-4">
+              <div class="upload-dropzone" id="upload-dropzone">
+                <input type="file" id="csv-file-input" accept=".csv,text/csv" class="d-none">
+                <div class="upload-icon-circle">
+                  <i class="bi bi-cloud-arrow-up-fill"></i>
+                </div>
+                <div class="upload-title">Drop your Bank Marketing CSV here or click to browse</div>
+                <div class="upload-subtitle">
+                  Supports standard Bank Marketing datasets (comma or semicolon delimited). Automatically parses and calculates response rates.
+                </div>
+                <div class="d-flex justify-content-center gap-2">
+                  <button class="btn btn-primary" type="button">
+                    <i class="bi bi-folder2-open"></i> Select CSV File
+                  </button>
+                </div>
+              </div>
+
+              <!-- Upload Status & Validation Feedback Alert -->
+              <div id="upload-status-alert" class="mt-3" style="display: none;"></div>
+
+              <!-- Required Schema Checklist -->
+              <div class="mt-4 pt-3 border-top">
+                <div class="small fw-bold text-uppercase text-secondary mb-2">
+                  <i class="bi bi-shield-check text-primary"></i> Recognized Schema Columns:
+                </div>
+                <div class="schema-checklist">
+                  <span class="schema-tag">age</span>
+                  <span class="schema-tag">job</span>
+                  <span class="schema-tag">marital</span>
+                  <span class="schema-tag">education</span>
+                  <span class="schema-tag">default</span>
+                  <span class="schema-tag">balance</span>
+                  <span class="schema-tag">housing</span>
+                  <span class="schema-tag">loan</span>
+                  <span class="schema-tag">contact</span>
+                  <span class="schema-tag">day</span>
+                  <span class="schema-tag">month</span>
+                  <span class="schema-tag">duration</span>
+                  <span class="schema-tag">campaign</span>
+                  <span class="schema-tag">pdays</span>
+                  <span class="schema-tag">previous</span>
+                  <span class="schema-tag">poutcome</span>
+                  <span class="schema-tag fw-bold text-primary">y (outcome)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Searchable, Sortable, Paginated Data Table Card -->
+          <div class="card">
+            <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div>
+                <h2 class="card-title"><i class="bi bi-table text-primary"></i> Active Campaign Data Records</h2>
+                <div class="card-subtitle">Search, sort, and inspect customer profiles in the active dataset</div>
+              </div>
+            </div>
+
+            <!-- Table Toolbar -->
+            <div class="table-toolbar">
+              <div class="table-search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" class="form-input" id="table-global-search" placeholder="Search by job, education, outcome...">
+              </div>
+
+              <div class="d-flex align-items-center gap-2">
+                <label for="table-page-size" class="small text-muted fw-semibold mb-0">Rows per page:</label>
+                <select class="form-select form-select-sm" id="table-page-size" style="width: auto;">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Responsive Table -->
+            <div class="table-responsive">
+              <table class="bi-table">
+                <thead>
+                  <tr>
+                    <th class="sortable" data-sort="id">ID <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="age">Age <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="job">Job <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="education">Education <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="balance">Balance ($) <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="housing">Housing Loan <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="contact">Channel <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="campaign">Touches <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="duration">Call Duration <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th class="sortable" data-sort="y">Outcome <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                  </tr>
+                </thead>
+                <tbody id="dataset-table-body">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div class="pagination-container">
+              <div id="table-entry-info">Showing 1 to 10 of entries</div>
+              <div class="pagination-controls" id="table-pagination-controls">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW 5: EXECUTIVE REPORTS
+             =================================================================== -->
+        <section class="page-view" id="view-reports">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Executive Campaign Performance Report</h1>
+              <p>Executive summary designed for marketing directors, compliance, and growth leadership.</p>
+            </div>
+            <div class="view-actions-group">
+              <button class="btn btn-outline" id="btn-print-report">
+                <i class="bi bi-printer"></i> Print / Save PDF
+              </button>
+              <button class="btn btn-primary" id="btn-export-report-csv">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Export Filtered CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Executive Banner -->
+          <div class="report-header-banner">
+            <div>
+              <div class="report-banner-title">Bank Marketing Strategic Analysis Report</div>
+              <div class="report-banner-meta">
+                <span><i class="bi bi-database"></i> Source: <strong id="report-meta-dataset">Benchmark Cohort</strong></span>
+                <span><i class="bi bi-calendar3"></i> Date: <strong id="report-meta-date"></strong></span>
+                <span><i class="bi bi-shield-check"></i> Status: Certified Analytics</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Key Findings & Strategic Takeaways -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h2 class="card-title"><i class="bi bi-award text-primary"></i> Strategic Takeaways & Observations to Test</h2>
+            </div>
+            <div class="card-body">
+              <div class="report-takeaway-card">
+                <h4>1. Contact Fatigue Threshold (Cap Touchpoints at 3)</h4>
+                <p>
+                  <strong>Observation to Test:</strong> Contacting prospects more than 3 times exhibits a 70%+ decline in response conversion while substantially increasing agent costs. Test capping outbound telemarketing queues at 3 touches before cycling the lead into a 90-day cooling period.
+                </p>
+              </div>
+
+              <div class="report-takeaway-card">
+                <h4>2. Student & Retiree Propensity Lift</h4>
+                <p>
+                  <strong>Observation to Test:</strong> Student and retired demographics consistently outperform middle-aged cohorts on fixed term deposit uptake. Test rolling out dedicated high-yield digital term deposit products customized for retiree wealth preservation and student liquid savings.
+                </p>
+              </div>
+
+              <div class="report-takeaway-card">
+                <h4>3. Mobile Channel Prioritization</h4>
+                <p>
+                  <strong>Observation to Test:</strong> Cellular contacts yield noticeably higher conversion than fixed landline numbers. Test pre-dialer phone number validation (HLR lookup) to route cellular prospects to top-tier conversion specialists.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Scorecard Table -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i class="bi bi-speedometer2 text-success"></i> Campaign Key Performance Scorecard</h2>
+            </div>
+            <div class="card-body p-0">
+              <table class="bi-table">
+                <thead>
+                  <tr>
+                    <th>Metric Indicator</th>
+                    <th>Observed Value</th>
+                    <th>Industry Benchmark</th>
+                    <th>Variance / Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Total Customer Cohort</strong></td>
+                    <td><span class="kpi-val-customers">--</span> prospects</td>
+                    <td>1,000+ per cohort</td>
+                    <td><span class="badge badge-success">Adequate Sample Size</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Successful Conversions</strong></td>
+                    <td><span class="kpi-val-success">--</span> subscriptions</td>
+                    <td>115 per 1,000</td>
+                    <td><span class="badge badge-info">Term Deposits</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Overall Response Rate</strong></td>
+                    <td><span class="kpi-val-rate">--%</span></td>
+                    <td>11.5%</td>
+                    <td><span class="kpi-trend kpi-trend-benchmark">--</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Outreach Contact Touches</strong></td>
+                    <td><span class="kpi-val-contacts">--</span> dials</td>
+                    <td>~2.5 touches/customer</td>
+                    <td><span class="badge badge-neutral">Dialer Pipeline</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW 6: SETTINGS & BACKEND API INTEGRATION
+             =================================================================== -->
+        <section class="page-view" id="view-settings">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Settings & REST API Integration</h1>
+              <p>Configure backend API endpoints for future integration, manage data caching, and customize dashboard parameters.</p>
+            </div>
+          </div>
+
+          <div class="settings-grid">
+            <!-- REST API Connector Card -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title"><i class="bi bi-hdd-network text-primary"></i> REST API Backend Connector</h2>
+              </div>
+              <div class="card-body">
+                <p class="small text-secondary mb-3">
+                  Connect your Python/FastAPI, Flask, Node.js, or Django backend when ready. The frontend is built with modular state stores for seamless API binding.
+                </p>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Backend API Base URL</label>
+                  <input type="url" class="form-input" id="api-base-url" placeholder="http://localhost:8000/api/v1" value="http://localhost:8000/api/v1">
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">API Authorization Token</label>
+                  <input type="password" class="form-input" id="api-key" placeholder="Bearer eyJhbGciOiJIUzI1NiIs..." value="demo_token_bank_bi_9921">
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between pt-2">
+                  <span class="badge badge-neutral"><i class="bi bi-clock-history"></i> Polling: Off (Client BI)</span>
+                  <button class="btn btn-primary btn-sm" id="btn-save-api-config">
+                    <i class="bi bi-save"></i> Save Configuration
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expected REST Endpoints Documentation -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title"><i class="bi bi-code-slash text-success"></i> Anticipated API Endpoints</h2>
+              </div>
+              <div class="card-body">
+                <div class="mb-2">
+                  <span class="badge badge-primary me-1">GET</span>
+                  <span class="api-endpoint-badge">/api/campaigns/analytics</span>
+                  <div class="text-muted small mt-1">Fetches aggregated KPIs and segment response distributions.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-success me-1">POST</span>
+                  <span class="api-endpoint-badge">/api/campaigns/upload</span>
+                  <div class="text-muted small mt-1">Multipart form upload of customer dataset CSV.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-info me-1">GET</span>
+                  <span class="api-endpoint-badge">/api/campaigns/insights</span>
+                  <div class="text-muted small mt-1">Fetches automated regression & clustering insights.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Application Data Reset Card -->
+            <div class="card">
+              <div class="card-header">
+                <h2 class="card-title text-danger"><i class="bi bi-trash text-danger"></i> Reset & In-Memory Cache</h2>
+              </div>
+              <div class="card-body">
+                <p class="small text-secondary mb-3">
+                  Clears active in-memory uploads and resets the dashboard to the default pre-loaded benchmark campaign dataset.
+                </p>
+                <button class="btn btn-outline border-danger text-danger btn-sm" id="btn-reset-everything">
+                  <i class="bi bi-arrow-counterclockwise"></i> Reset Application State
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Floating Toast Notifications Container -->
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  </div>
+
+  <!-- External Libraries: Bootstrap 5 Bundle & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Application Logic Modules -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data/demoData.js"></script>
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/csvParser.js"></script>
+  <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/charts.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

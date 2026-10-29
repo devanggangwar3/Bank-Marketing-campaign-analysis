@@ -2,13 +2,13 @@
 Application Configuration Module for Bank Marketing Backend
 """
 import os
-from pathlib import Path
+from pathlib import Pathl
 
 BASE_DIR = Path(__file__).resolve().parent
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'bank-pulse-secret-key-marketing-analytics-2026')
-    DATABASE_PATH = os.environ.get('DATABASE_PATH', str(BASE_DIR / 'data' / 'bank_campaign.db'))
+    DATABASE_PATH = os.environ.get('DATABASrun thisE_PATH', str(BASE_DIR / 'data' / 'bank_campaign.db'))
     MAX_CONTENT_LENGTH = int(os.environ.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024)) # 16 MB
     ALLOWED_EXTENSIONS = {'csv'}
     

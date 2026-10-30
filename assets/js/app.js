@@ -4,6 +4,21 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+  const loginScreen = document.getElementById('login-screen');
+  const loginForm = document.getElementById('login-form');
+  const appContainer = document.querySelector('.app-container');
+
+  if (loginScreen && loginForm && appContainer) {
+    loginForm.addEventListener('submit', event => {
+      event.preventDefault();
+      if (!loginForm.reportValidity()) return;
+
+      appContainer.removeAttribute('aria-hidden');
+      loginScreen.classList.add('is-dismissed');
+      window.setTimeout(() => loginScreen.remove(), 240);
+    });
+  }
+
   // 1. Initialize UI Handlers
   UIEngine.init();
 

@@ -25,8 +25,50 @@
 </head>
 <body>
 
+  <main class="login-screen" id="login-screen" aria-labelledby="login-title">
+    <section class="login-brand-panel">
+      <div class="brand-wrapper login-brand">
+        <div class="brand-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></div>
+        <div class="brand-text">
+          <span class="brand-title">BankPulse BI</span>
+          <span class="brand-subtitle">Marketing Intelligence</span>
+        </div>
+      </div>
+
+      <div class="login-brand-copy">
+        <span class="login-eyebrow">Campaign intelligence workspace</span>
+        <h1>See the signal behind every campaign.</h1>
+        <p>Bring response trends, customer segments and outreach performance into one clear view.</p>
+      </div>
+
+      <div class="login-brand-footer">BankPulse BI <span>·</span> Campaign Team</div>
+    </section>
+
+    <section class="login-form-panel">
+      <div class="login-form-wrap">
+        <div class="login-mode"><span></span> Demo workspace</div>
+        <h2 id="login-title">Welcome back</h2>
+        <p class="login-intro">Enter demo details to open the campaign dashboard.</p>
+
+        <form id="login-form">
+          <div class="login-field">
+            <label for="login-email">Email address</label>
+            <input id="login-email" type="email" autocomplete="off" placeholder="analyst@example.com" required>
+          </div>
+          <div class="login-field">
+            <label for="login-passcode">Passcode</label>
+            <input id="login-passcode" type="password" autocomplete="off" placeholder="Enter any demo value" required>
+          </div>
+          <button class="login-submit" type="submit">Continue to dashboard <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
+        </form>
+
+        <p class="login-disclaimer"><i class="bi bi-info-circle" aria-hidden="true"></i> Demo only. Values are not verified, sent or stored. Do not use real credentials.</p>
+      </div>
+    </section>
+  </main>
+
   <!-- Application Shell -->
-  <div class="app-container">
+  <div class="app-container" aria-hidden="true">
 
     <!-- Mobile Sidebar Backdrop -->
     <div class="sidebar-backdrop"></div>

@@ -1,38 +1,38 @@
 /* ==========================================================================
    Design Tokens & CSS Variables
-   Theme: Professional Banking Intelligence (Deep Navy, Slate & Vibrant Accents)
+  Theme: Modern Banking Intelligence (Evergreen, Soft Sage & Bright Accents)
    ========================================================================== */
 
 :root {
-  /* Color Palette - Navy & Slate Base */
-  --navy-950: #070D1E;
-  --navy-900: #0B1528;
-  --navy-850: #0F1D38;
-  --navy-800: #162646;
-  --navy-700: #1E355F;
-  --navy-600: #294A84;
+  /* Evergreen brand foundation */
+  --navy-950: #10231F;
+  --navy-900: #142B25;
+  --navy-850: #1B3931;
+  --navy-800: #254A3F;
+  --navy-700: #326453;
+  --navy-600: #437D68;
 
   /* Neutrals & Slate */
-  --slate-900: #0F172A;
-  --slate-800: #1E293B;
-  --slate-700: #334155;
-  --slate-600: #475569;
-  --slate-500: #64748B;
-  --slate-400: #94A3B8;
-  --slate-300: #CBD5E1;
-  --slate-200: #E2E8F0;
-  --slate-100: #F1F5F9;
-  --slate-50:  #F8FAFC;
+  --slate-900: #1B2924;
+  --slate-800: #2B3A34;
+  --slate-700: #43534B;
+  --slate-600: #5D6C64;
+  --slate-500: #748179;
+  --slate-400: #9AA59D;
+  --slate-300: #C5CEC7;
+  --slate-200: #DCE3DD;
+  --slate-100: #EDF1EC;
+  --slate-50:  #F6F8F4;
   --white:     #FFFFFF;
 
-  /* Primary Brand Blue */
-  --primary-600: #2563EB;
-  --primary-700: #1D4ED8;
-  --primary-800: #1E40AF;
-  --primary-500: #3B82F6;
-  --primary-400: #60A5FA;
-  --primary-100: #DBEAFE;
-  --primary-50:  #EFF6FF;
+  /* Primary Brand Teal */
+  --primary-600: #16796B;
+  --primary-700: #105F54;
+  --primary-800: #104B43;
+  --primary-500: #279582;
+  --primary-400: #72BFA9;
+  --primary-100: #D6EEE6;
+  --primary-50:  #EDF7F2;
 
   /* Accent & Semantic Colors */
   --emerald-600: #059669;
@@ -45,23 +45,23 @@
   --amber-100:   #FEF3C7;
   --amber-50:    #FFFBEB;
 
-  --rose-600:    #E11D48;
-  --rose-500:    #F43F5E;
-  --rose-100:    #FFE4E6;
-  --rose-50:     #FFF1F2;
+  --rose-600:    #C84B3C;
+  --rose-500:    #E16A50;
+  --rose-100:    #F9E1D9;
+  --rose-50:     #FFF3EE;
 
   --indigo-600:  #4F46E5;
   --indigo-500:  #6366F1;
   --indigo-100:  #E0E7FF;
   --indigo-50:   #EEF2FF;
 
-  --teal-600:    #0D9488;
-  --teal-500:    #14B8A6;
-  --teal-100:    #CCFBF1;
-  --teal-50:     #F0FDFA;
+  --teal-600:    #16796B;
+  --teal-500:    #279582;
+  --teal-100:    #D6EEE6;
+  --teal-50:     #EDF7F2;
 
   /* Application Layout Surfaces */
-  --bg-page:        var(--slate-50);
+  --bg-page:        #F3F6F0;
   --bg-surface:     var(--white);
   --bg-subtle:      var(--slate-100);
   --bg-sidebar:     var(--navy-900);
@@ -69,8 +69,9 @@
   --bg-header:      var(--white);
 
   /* Typography */
-  --font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 
   /* Text Colors */
   --text-main:      var(--slate-900);
@@ -80,25 +81,25 @@
   --text-brand:     var(--primary-600);
 
   /* Borders & Dividers */
-  --border-color:        var(--slate-200);
+  --border-color:        #DDE5DD;
   --border-color-light:  var(--slate-100);
   --border-color-dark:   var(--slate-300);
   --border-color-focus:  var(--primary-500);
 
   /* Elevation Shadows */
-  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
-  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
-  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-  --shadow-card-hover: 0 12px 24px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.06);
+  --shadow-xs: 0 1px 2px rgba(23, 47, 37, 0.04);
+  --shadow-sm: 0 2px 6px rgba(23, 47, 37, 0.05), 0 1px 2px rgba(23, 47, 37, 0.03);
+  --shadow-md: 0 8px 18px rgba(23, 47, 37, 0.07);
+  --shadow-lg: 0 14px 28px rgba(23, 47, 37, 0.09);
+  --shadow-xl: 0 22px 42px rgba(23, 47, 37, 0.14);
+  --shadow-card-hover: 0 12px 24px rgba(23, 47, 37, 0.1);
 
   /* Border Radii */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
   --radius-full: 9999px;
 
   /* Transitions */

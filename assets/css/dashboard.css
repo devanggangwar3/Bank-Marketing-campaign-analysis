@@ -2,6 +2,43 @@
    Dashboard & Analytics Views Specific Layouts
    ========================================================================== */
 
+/* Dashboard Overview */
+#view-dashboard .filter-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+}
+
+#view-dashboard .kpi-card.accent-warning {
+  --kpi-accent: #E5BE62;
+  background: linear-gradient(145deg, #783F32, #9B5942);
+  border-color: #9B5942;
+}
+
+#view-dashboard .kpi-card.accent-warning .kpi-label,
+#view-dashboard .kpi-card.accent-warning .kpi-footer > span:first-child {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+#view-dashboard .kpi-card.accent-warning .kpi-value {
+  color: #FFFFFF;
+}
+
+#view-dashboard .kpi-card.accent-warning .kpi-icon-wrap {
+  background: rgba(229, 190, 98, 0.16);
+  color: #F0D58E;
+}
+
+#view-dashboard .kpi-card.accent-warning .kpi-trend-benchmark {
+  background: rgba(183, 217, 121, 0.16);
+  color: #D7EBAA;
+}
+
+@media (max-width: 575.98px) {
+  #view-dashboard .filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Charts Grid Layouts */
 .charts-grid-two-col {
   display: grid;

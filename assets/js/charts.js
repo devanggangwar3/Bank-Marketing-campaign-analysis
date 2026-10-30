@@ -28,7 +28,7 @@ const ChartsEngine = {
             borderRadius: 3,
             usePointStyle: true,
             font: {
-              family: "'Plus Jakarta Sans', sans-serif",
+              family: "'DM Sans', sans-serif",
               size: 11,
               weight: '600'
             },
@@ -36,9 +36,9 @@ const ChartsEngine = {
           }
         },
         tooltip: {
-          backgroundColor: '#0F172A',
-          titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '700' },
-          bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
+          backgroundColor: '#142B25',
+          titleFont: { family: "'DM Sans', sans-serif", size: 12, weight: '700' },
+          bodyFont: { family: "'DM Sans', sans-serif", size: 11 },
           padding: 10,
           cornerRadius: 8,
           boxPadding: 4,
@@ -55,7 +55,7 @@ const ChartsEngine = {
         x: {
           grid: { display: false },
           ticks: {
-            font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
+            font: { family: "'DM Sans', sans-serif", size: 11 },
             color: '#64748B'
           }
         },
@@ -63,7 +63,7 @@ const ChartsEngine = {
           border: { dash: [4, 4] },
           grid: { color: '#E2E8F0' },
           ticks: {
-            font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 },
+            font: { family: "'DM Sans', sans-serif", size: 11 },
             color: '#64748B',
             callback: value => `${value}%`
           }
@@ -89,8 +89,8 @@ const ChartsEngine = {
 
     const ctx = canvas.getContext('2d');
     const primaryGrad = ctx.createLinearGradient(0, 0, 0, 300);
-    primaryGrad.addColorStop(0, 'rgba(37, 99, 235, 0.85)');
-    primaryGrad.addColorStop(1, 'rgba(37, 99, 235, 0.35)');
+    primaryGrad.addColorStop(0, 'rgba(22, 121, 107, 0.85)');
+    primaryGrad.addColorStop(1, 'rgba(22, 121, 107, 0.35)');
 
     this.instances[canvasId] = new Chart(canvas, {
       type: 'bar',
@@ -102,7 +102,7 @@ const ChartsEngine = {
             label: 'Response Rate (%)',
             data: rates,
             backgroundColor: primaryGrad,
-            borderColor: '#2563EB',
+            borderColor: '#16796B',
             borderWidth: 1.5,
             borderRadius: 6,
             yAxisID: 'y'
@@ -111,7 +111,7 @@ const ChartsEngine = {
             type: 'line',
             label: 'Target Benchmark (11.5%)',
             data: labels.map(() => APP_CONFIG.benchmarkResponseRate),
-            borderColor: '#F59E0B',
+            borderColor: '#D99A2B',
             borderWidth: 2,
             borderDash: [5, 5],
             pointRadius: 0,
@@ -165,7 +165,7 @@ const ChartsEngine = {
 
     const labels = channelData.map(c => c.label);
     const rates = channelData.map(c => c.responseRate);
-    const colors = ['#2563EB', '#10B981', '#64748B'];
+    const colors = ['#16796B', '#D99A2B', '#80938A'];
 
     this.instances[canvasId] = new Chart(canvas, {
       type: 'bar',
@@ -225,8 +225,8 @@ const ChartsEngine = {
 
     const ctx = canvas.getContext('2d');
     const lineGrad = ctx.createLinearGradient(0, 0, 0, 250);
-    lineGrad.addColorStop(0, 'rgba(239, 68, 68, 0.25)');
-    lineGrad.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
+    lineGrad.addColorStop(0, 'rgba(215, 103, 80, 0.25)');
+    lineGrad.addColorStop(1, 'rgba(215, 103, 80, 0.0)');
 
     this.instances[canvasId] = new Chart(canvas, {
       type: 'line',
@@ -235,11 +235,11 @@ const ChartsEngine = {
         datasets: [{
           label: 'Response Rate Decay (%)',
           data: rates,
-          borderColor: '#EF4444',
+          borderColor: '#D76750',
           backgroundColor: lineGrad,
           fill: true,
           tension: 0.35,
-          pointBackgroundColor: '#EF4444',
+          pointBackgroundColor: '#D76750',
           pointBorderColor: '#FFFFFF',
           pointBorderWidth: 2,
           pointRadius: 5,
@@ -298,8 +298,8 @@ const ChartsEngine = {
         labels: outcomeData.labels,
         datasets: [{
           data: outcomeData.counts,
-          backgroundColor: ['#10B981', '#E2E8F0'],
-          hoverBackgroundColor: ['#059669', '#CBD5E1'],
+          backgroundColor: ['#2B8A68', '#DCE3DD'],
+          hoverBackgroundColor: ['#16796B', '#C5CEC7'],
           borderWidth: 2,
           borderColor: '#FFFFFF',
           cutout: '72%'
@@ -315,11 +315,11 @@ const ChartsEngine = {
               boxWidth: 10,
               boxHeight: 10,
               usePointStyle: true,
-              font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 }
+              font: { family: "'DM Sans', sans-serif", size: 11 }
             }
           },
           tooltip: {
-            backgroundColor: '#0F172A',
+            backgroundColor: '#142B25',
             padding: 10,
             cornerRadius: 8,
             callbacks: {
@@ -358,7 +358,7 @@ const ChartsEngine = {
         datasets: [{
           label: 'Response Rate (%)',
           data: rates,
-          backgroundColor: rates.map(r => r >= APP_CONFIG.benchmarkResponseRate ? '#2563EB' : '#94A3B8'),
+          backgroundColor: rates.map(r => r >= APP_CONFIG.benchmarkResponseRate ? '#16796B' : '#A7B3A9'),
           borderRadius: 5,
           borderWidth: 0,
           maxBarThickness: 22
@@ -425,14 +425,14 @@ const ChartsEngine = {
           {
             label: 'No Housing Debt',
             data: noHousingRates,
-            backgroundColor: '#10B981',
+            backgroundColor: '#279582',
             borderRadius: 6,
             maxBarThickness: 32
           },
           {
             label: 'Has Housing Loan',
             data: withHousingRates,
-            backgroundColor: '#64748B',
+            backgroundColor: '#768980',
             borderRadius: 6,
             maxBarThickness: 32
           }

@@ -53,22 +53,22 @@ const APP_CONFIG = {
 
   // Color tokens for Chart.js
   chartColors: {
-    navyDark: '#0B1528',
-    navyMid: '#1E293B',
-    primary: '#2563EB',
-    primaryGlow: 'rgba(37, 99, 235, 0.2)',
-    emerald: '#10B981',
-    emeraldGlow: 'rgba(16, 185, 129, 0.2)',
-    amber: '#F59E0B',
-    rose: '#EF4444',
-    indigo: '#6366F1',
-    teal: '#14B8A6',
-    slateBorder: '#E2E8F0',
-    slateText: '#64748B',
+    navyDark: '#142B25',
+    navyMid: '#2B3A34',
+    primary: '#16796B',
+    primaryGlow: 'rgba(22, 121, 107, 0.2)',
+    emerald: '#2B8A68',
+    emeraldGlow: 'rgba(43, 138, 104, 0.2)',
+    amber: '#D99A2B',
+    rose: '#D76750',
+    indigo: '#537F88',
+    teal: '#279582',
+    slateBorder: '#DCE3DD',
+    slateText: '#748179',
     palette: [
-      '#2563EB', '#10B981', '#6366F1', '#F59E0B',
-      '#EC4899', '#14B8A6', '#8B5CF6', '#F97316',
-      '#06B6D4', '#84CC16', '#64748B', '#D946EF'
+      '#16796B', '#B7D979', '#D99A2B', '#D76750',
+      '#537F88', '#79B5A2', '#53695F', '#E6B75A',
+      '#7D9C93', '#A8C66C', '#64746C', '#C9826A'
     ]
   }
 };

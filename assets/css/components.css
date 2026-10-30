@@ -8,7 +8,7 @@
 .card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
   overflow: hidden;
@@ -19,7 +19,7 @@
 }
 
 .card-header {
-  padding: 1.15rem 1.4rem;
+  padding: 1.1rem 1.3rem;
   background-color: transparent;
   border-bottom: 1px solid var(--border-color);
   display: flex;
@@ -67,7 +67,7 @@
 .kpi-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 1.35rem;
   box-shadow: var(--shadow-sm);
   position: relative;
@@ -88,7 +88,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background-color: var(--kpi-accent, var(--primary-600));
 }
 
@@ -145,7 +145,7 @@
 .kpi-value {
   font-size: 1.95rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   color: var(--navy-950);
   line-height: 1.1;
   margin-bottom: 0.45rem;
@@ -282,14 +282,14 @@
 }
 
 .btn-primary {
-  background-color: var(--primary-600);
+  background: linear-gradient(135deg, #16796B, #105F54);
   color: var(--white);
-  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 3px 8px rgba(22, 121, 107, 0.2);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-700);
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, #105F54, #104B43);
+  box-shadow: 0 5px 12px rgba(22, 121, 107, 0.25);
 }
 
 .btn-secondary {
@@ -388,7 +388,7 @@
 .insight-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   padding: 1.35rem;
   box-shadow: var(--shadow-sm);
   display: flex;
@@ -559,7 +559,7 @@
 }
 
 .bi-table tbody tr:hover {
-  background-color: rgba(241, 245, 249, 0.6);
+  background-color: rgba(237, 243, 236, 0.72);
 }
 
 /* Table Toolbar */

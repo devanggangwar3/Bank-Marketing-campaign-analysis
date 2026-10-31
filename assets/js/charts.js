@@ -18,35 +18,43 @@ const ChartsEngine = {
     return {
       responsive: true,
       maintainAspectRatio: false,
+      animation: {
+        duration: 900,
+        easing: 'easeInOutQuart'
+      },
       plugins: {
         legend: {
           display: true,
           position: 'top',
           labels: {
-            boxWidth: 12,
-            boxHeight: 12,
-            borderRadius: 3,
+            boxWidth: 14,
+            boxHeight: 14,
+            borderRadius: 4,
             usePointStyle: true,
+            pointStyleWidth: 14,
             font: {
               family: "'DM Sans', sans-serif",
-              size: 11,
-              weight: '600'
+              size: 12,
+              weight: '700'
             },
-            color: '#475569'
+            color: '#334155',
+            padding: 18
           }
         },
         tooltip: {
-          backgroundColor: '#142B25',
-          titleFont: { family: "'DM Sans', sans-serif", size: 12, weight: '700' },
-          bodyFont: { family: "'DM Sans', sans-serif", size: 11 },
-          padding: 10,
-          cornerRadius: 8,
-          boxPadding: 4,
+          backgroundColor: 'rgba(15,23,42,0.92)',
+          titleFont: { family: "'DM Sans', sans-serif", size: 13, weight: '700' },
+          bodyFont: { family: "'DM Sans', sans-serif", size: 12 },
+          padding: 14,
+          cornerRadius: 12,
+          boxPadding: 6,
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
           callbacks: {
             label(context) {
               const label = context.dataset.label || '';
               const value = context.parsed.y !== undefined ? context.parsed.y : context.parsed;
-              return `${label}: ${value}%`;
+              return `  ${label}: ${value}%`;
             }
           }
         }
@@ -54,17 +62,18 @@ const ChartsEngine = {
       scales: {
         x: {
           grid: { display: false },
+          border: { display: false },
           ticks: {
-            font: { family: "'DM Sans', sans-serif", size: 11 },
+            font: { family: "'DM Sans', sans-serif", size: 11, weight: '600' },
             color: '#64748B'
           }
         },
         y: {
-          border: { dash: [4, 4] },
-          grid: { color: '#E2E8F0' },
+          border: { dash: [4, 4], display: false },
+          grid: { color: 'rgba(226,232,240,0.7)' },
           ticks: {
             font: { family: "'DM Sans', sans-serif", size: 11 },
-            color: '#64748B',
+            color: '#94A3B8',
             callback: value => `${value}%`
           }
         }
@@ -88,9 +97,10 @@ const ChartsEngine = {
     const rates = periodData.map(p => p.responseRate);
 
     const ctx = canvas.getContext('2d');
-    const primaryGrad = ctx.createLinearGradient(0, 0, 0, 300);
-    primaryGrad.addColorStop(0, 'rgba(22, 121, 107, 0.85)');
-    primaryGrad.addColorStop(1, 'rgba(22, 121, 107, 0.35)');
+    const primaryGrad = ctx.createLinearGradient(0, 0, 0, 320);
+    primaryGrad.addColorStop(0, 'rgba(37, 117, 252, 0.95)');
+    primaryGrad.addColorStop(0.5, 'rgba(22, 121, 107, 0.85)');
+    primaryGrad.addColorStop(1, 'rgba(22, 121, 107, 0.2)');
 
     this.instances[canvasId] = new Chart(canvas, {
       type: 'bar',
@@ -102,20 +112,22 @@ const ChartsEngine = {
             label: 'Response Rate (%)',
             data: rates,
             backgroundColor: primaryGrad,
-            borderColor: '#16796B',
-            borderWidth: 1.5,
-            borderRadius: 6,
+            borderColor: 'rgba(37,117,252,0.6)',
+            borderWidth: 1,
+            borderRadius: 10,
+            borderSkipped: false,
             yAxisID: 'y'
           },
           {
             type: 'line',
             label: 'Target Benchmark (11.5%)',
             data: labels.map(() => APP_CONFIG.benchmarkResponseRate),
-            borderColor: '#D99A2B',
-            borderWidth: 2,
-            borderDash: [5, 5],
+            borderColor: '#F59E0B',
+            borderWidth: 2.5,
+            borderDash: [6, 4],
             pointRadius: 0,
             fill: false,
+            tension: 0,
             yAxisID: 'y'
           }
         ]
@@ -165,7 +177,16 @@ const ChartsEngine = {
 
     const labels = channelData.map(c => c.label);
     const rates = channelData.map(c => c.responseRate);
-    const colors = ['#16796B', '#D99A2B', '#80938A'];
+    const colors = [
+      'rgba(37,117,252,0.85)',
+      'rgba(16,185,129,0.85)',
+      'rgba(245,158,11,0.85)'
+    ];
+    const hoverColors = [
+      'rgba(37,117,252,1)',
+      'rgba(16,185,129,1)',
+      'rgba(245,158,11,1)'
+    ];
 
     this.instances[canvasId] = new Chart(canvas, {
       type: 'bar',
@@ -175,9 +196,10 @@ const ChartsEngine = {
           label: 'Response Rate (%)',
           data: rates,
           backgroundColor: colors.slice(0, labels.length),
-          borderRadius: 8,
+          hoverBackgroundColor: hoverColors.slice(0, labels.length),
+          borderRadius: 12,
           borderWidth: 0,
-          maxBarThickness: 45
+          maxBarThickness: 55
         }]
       },
       options: {
@@ -225,8 +247,8 @@ const ChartsEngine = {
 
     const ctx = canvas.getContext('2d');
     const lineGrad = ctx.createLinearGradient(0, 0, 0, 250);
-    lineGrad.addColorStop(0, 'rgba(215, 103, 80, 0.25)');
-    lineGrad.addColorStop(1, 'rgba(215, 103, 80, 0.0)');
+    lineGrad.addColorStop(0, 'rgba(239, 68, 68, 0.35)');
+    lineGrad.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
 
     this.instances[canvasId] = new Chart(canvas, {
       type: 'line',
@@ -235,15 +257,16 @@ const ChartsEngine = {
         datasets: [{
           label: 'Response Rate Decay (%)',
           data: rates,
-          borderColor: '#D76750',
+          borderColor: '#EF4444',
           backgroundColor: lineGrad,
           fill: true,
-          tension: 0.35,
-          pointBackgroundColor: '#D76750',
+          tension: 0.42,
+          pointBackgroundColor: '#EF4444',
           pointBorderColor: '#FFFFFF',
-          pointBorderWidth: 2,
-          pointRadius: 5,
-          pointHoverRadius: 7
+          pointBorderWidth: 3,
+          pointRadius: 7,
+          pointHoverRadius: 10,
+          borderWidth: 3
         }]
       },
       options: {
@@ -298,36 +321,49 @@ const ChartsEngine = {
         labels: outcomeData.labels,
         datasets: [{
           data: outcomeData.counts,
-          backgroundColor: ['#2B8A68', '#DCE3DD'],
-          hoverBackgroundColor: ['#16796B', '#C5CEC7'],
-          borderWidth: 2,
+          backgroundColor: [
+            'rgba(37, 117, 252, 0.9)',
+            'rgba(226, 232, 240, 0.7)'
+          ],
+          hoverBackgroundColor: [
+            'rgba(37, 117, 252, 1)',
+            'rgba(203, 213, 225, 0.9)'
+          ],
+          borderWidth: 3,
           borderColor: '#FFFFFF',
-          cutout: '72%'
+          hoverBorderColor: '#FFFFFF',
+          hoverOffset: 8,
+          cutout: '75%'
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { animateRotate: true, duration: 1000, easing: 'easeInOutQuart' },
         plugins: {
           legend: {
             position: 'bottom',
             labels: {
-              boxWidth: 10,
-              boxHeight: 10,
+              boxWidth: 12,
+              boxHeight: 12,
               usePointStyle: true,
-              font: { family: "'DM Sans', sans-serif", size: 11 }
+              font: { family: "'DM Sans', sans-serif", size: 12, weight: '600' },
+              color: '#334155',
+              padding: 16
             }
           },
           tooltip: {
-            backgroundColor: '#142B25',
-            padding: 10,
-            cornerRadius: 8,
+            backgroundColor: 'rgba(15,23,42,0.92)',
+            padding: 14,
+            cornerRadius: 12,
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
             callbacks: {
               label(context) {
                 const val = context.parsed;
                 const total = outcomeData.total || 1;
                 const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                return `${context.label}: ${val.toLocaleString()} (${pct}%)`;
+                return `  ${context.label}: ${val.toLocaleString()} (${pct}%)`;
               }
             }
           }

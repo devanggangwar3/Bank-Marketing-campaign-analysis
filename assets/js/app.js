@@ -7,7 +7,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 1. Initialize UI Handlers
   UIEngine.init();
 
-  // 2. Render helper function
+  // 2. Sidebar navigation click handlers – make every nav item clickable
+  document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+    link.style.cursor = 'pointer';
+    link.addEventListener('click', () => {
+      const target = link.getAttribute('data-view-target');
+      if (target) appState.setView(target);
+    });
+  });
+
+  // 3. Also wire any button inside the content area that has data-view-target
+  document.querySelectorAll('[data-view-target]:not(.sidebar-nav-link)').forEach(btn => {
+    btn.style.cursor = 'pointer';
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-view-target');
+      if (target) appState.setView(target);
+    });
+  });
+
+  // 5. Render helper function
   const renderDashboardViews = (state) => {
     const isApi = state.backendConnected && state.apiData.kpis;
 

@@ -92,6 +92,12 @@
           <i class="bi bi-gear-fill"></i>
           <span>Settings & API</span>
         </a>
+
+        <div class="nav-section-title mt-3">About</div>
+        <a class="sidebar-nav-link" data-view-target="about" id="nav-about">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>About Project</span>
+        </a>
       </div>
 
       <div class="sidebar-footer">
@@ -133,6 +139,21 @@
               <span class="workspace-type">Shared Workspace</span>
             </div>
           </div>
+          <details class="topbar-overflow-menu" id="topbar-overflow-menu">
+            <summary aria-label="Open dashboard menu" title="More options">
+              <i class="bi bi-three-dots" aria-hidden="true"></i>
+            </summary>
+            <nav class="topbar-overflow-panel" aria-label="Dashboard shortcuts">
+              <a href="#dashboard" data-view-target="dashboard"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i> Dashboard</a>
+              <a href="#analytics" data-view-target="analytics"><i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i> Campaign Analytics</a>
+              <a href="#segments" data-view-target="segments"><i class="bi bi-people-fill" aria-hidden="true"></i> Customer Segments</a>
+              <div class="topbar-overflow-divider"></div>
+              <a href="#upload" data-view-target="upload"><i class="bi bi-cloud-arrow-up-fill" aria-hidden="true"></i> Upload Dataset</a>
+              <a href="#reports" data-view-target="reports"><i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i> Executive Reports</a>
+              <a href="#settings" data-view-target="settings"><i class="bi bi-gear-fill" aria-hidden="true"></i> Settings &amp; API</a>
+              <a href="#about" data-view-target="about"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> About Project</a>
+            </nav>
+          </details>
         </div>
       </header>
 
@@ -1409,6 +1430,193 @@
                 </button>
               </div>
             </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW: ABOUT THE PROJECT
+             =================================================================== -->
+        <section class="page-view" id="view-about">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>About This Project</h1>
+              <p>Learn how BankPulse BI turns bank marketing campaign data into practical insights.</p>
+            </div>
+          </div>
+
+          <section class="about-project-hero" aria-labelledby="about-project-title">
+            <div class="about-project-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></div>
+            <div>
+              <span class="about-project-eyebrow">Bank Marketing Intelligence</span>
+              <h2 id="about-project-title">Bank Marketing Campaign Analysis</h2>
+              <p>
+                Analyze campaign contact records and outcomes to understand response rates across
+                customer groups and campaign conditions.
+              </p>
+            </div>
+          </section>
+
+          <dl class="about-project-meta" aria-label="Project details">
+            <div class="about-project-meta-item">
+              <dt><i class="bi bi-hash" aria-hidden="true"></i> Project code</dt>
+              <dd>DA-014</dd>
+            </div>
+            <div class="about-project-meta-item">
+              <dt><i class="bi bi-diagram-3" aria-hidden="true"></i> Domain</dt>
+              <dd>Marketing Analytics</dd>
+            </div>
+            <div class="about-project-meta-item">
+              <dt><i class="bi bi-bar-chart-line" aria-hidden="true"></i> Analysis focus</dt>
+              <dd>Campaign response rates</dd>
+            </div>
+          </dl>
+
+          <div class="about-project-grid">
+            <section class="card about-project-card about-project-purpose">
+              <div class="card-header">
+                <h2 class="card-title"><i class="bi bi-bullseye text-primary"></i> Purpose</h2>
+              </div>
+              <div class="card-body">
+                <p>
+                  Help marketing teams understand which customer groups, communication channels,
+                  contact periods, and contact frequencies are associated with stronger campaign
+                  response. The analysis summarizes campaign outcomes, compares response rates, and
+                  turns patterns in the data into practical questions the team can test in future
+                  campaigns.
+                </p>
+              </div>
+            </section>
+
+            <section class="card about-project-card about-project-roadmap">
+              <div class="card-header">
+                <h2 class="card-title"><i class="bi bi-signpost-split text-success"></i> Project Roadmap</h2>
+              </div>
+              <div class="card-body">
+                <section class="about-roadmap-phase" aria-labelledby="roadmap-frontend-title">
+                  <h3 id="roadmap-frontend-title"><i class="bi bi-window" aria-hidden="true"></i> Part 1: Frontend</h3>
+                  <p class="about-roadmap-intro">Build the interactive dashboard that lets marketing teams explore campaign results.</p>
+                  <ol class="about-roadmap-list">
+                    <li>
+                      <span class="about-roadmap-step">1</span>
+                      <div><strong>Create the dashboard layout</strong><p>Use HTML5, CSS3, and Bootstrap to build responsive navigation, campaign pages, filters, and data-upload controls.</p></div>
+                    </li>
+                    <li>
+                      <span class="about-roadmap-step">2</span>
+                      <div><strong>Add interactive analysis views</strong><p>Use JavaScript to connect navigation, campaign filters, KPI summaries, customer segments, and report actions.</p></div>
+                    </li>
+                    <li>
+                      <span class="about-roadmap-step">3</span>
+                      <div><strong>Visualize campaign performance</strong><p>Use Chart.js to display response rates, channel comparisons, campaign periods, and contact-frequency patterns, including sample counts for context.</p></div>
+                    </li>
+                    <li>
+                      <span class="about-roadmap-step">4</span>
+                      <div><strong>Connect the user interface to data</strong><p>Show backend results when the API is available and provide a benchmark-data fallback when it is not.</p></div>
+                    </li>
+                  </ol>
+                </section>
+
+                <section class="about-roadmap-phase" aria-labelledby="roadmap-backend-title">
+                  <h3 id="roadmap-backend-title"><i class="bi bi-server" aria-hidden="true"></i> Part 2: Backend</h3>
+                  <p class="about-roadmap-intro">Prepare, analyze, and serve campaign data through a Python API.</p>
+                  <ol class="about-roadmap-list">
+                    <li>
+                      <span class="about-roadmap-step">1</span>
+                      <div><strong>Load and validate campaign data</strong><p>Use Python and Pandas to read public, synthetic, or uploaded CSV data; check required fields, clean category labels, and handle invalid or duplicate records.</p></div>
+                    </li>
+                    <li>
+                      <span class="about-roadmap-step">2</span>
+                      <div><strong>Calculate reliable metrics</strong><p>Define the campaign outcome clearly, calculate responses over total records for each group, and return both rates and denominators.</p></div>
+                    </li>
+                    <li>
+                      <span class="about-roadmap-step">3</span>
+                      <div><strong>Analyze and store results</strong><p>Compare customer groups, channels, contact periods, and contact frequency; use Flask API endpoints and SQLite to serve and store campaign data.</p></div>
+                    </li>
+                    <li>
+                      <span class="about-roadmap-step">4</span>
+                      <div><strong>Test and communicate findings</strong><p>Verify data processing and API behavior, then provide summaries and testable recommendations. Treat observed relationships as associations, not proof of causation.</p></div>
+                    </li>
+                  </ol>
+                </section>
+              </div>
+            </section>
+
+            <section class="card about-project-card about-project-explore">
+              <div class="card-header">
+                <h2 class="card-title"><i class="bi bi-stars text-success"></i> What You Can Explore</h2>
+              </div>
+              <div class="card-body">
+                <ul class="about-project-list">
+                  <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Campaign KPIs, response rates, and trends</li>
+                  <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Customer segments and contact fatigue</li>
+                  <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i> ROI simulations and lead propensity analysis</li>
+                  <li><i class="bi bi-check-circle-fill" aria-hidden="true"></i> Cohort comparisons, CSV uploads, and reports</li>
+                </ul>
+              </div>
+            </section>
+
+            <section class="card about-project-card about-project-stack">
+              <div class="card-header">
+                <h2 class="card-title"><i class="bi bi-code-slash text-primary"></i> Technology Stack</h2>
+              </div>
+              <div class="card-body">
+                <div class="about-stack-group">
+                  <span class="about-stack-label">Frontend</span>
+                  <button class="about-stack-tag" type="button" data-tech-name="HTML5" data-tech-type="Markup language" data-tech-description="Defines the structure and meaning of web pages. This project uses HTML5 to organize the dashboard, navigation, data views, forms, and report content." aria-controls="frontend-tech-info" aria-pressed="false">HTML5</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="CSS3" data-tech-type="Style sheet language" data-tech-description="Controls the appearance and layout of web pages. The dashboard's colors, typography, cards, charts, responsive layout, and interactive states are styled with CSS." aria-controls="frontend-tech-info" aria-pressed="false">CSS3</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="JavaScript" data-tech-type="Programming language" data-tech-description="Adds behavior and interactivity to web pages. In this project it manages navigation, filters, data updates, uploads, exports, and communication with the backend API." aria-controls="frontend-tech-info" aria-pressed="false">JavaScript</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="Bootstrap" data-tech-type="Frontend UI framework" data-tech-description="A toolkit of reusable layout and interface styles. This project uses Bootstrap for responsive layout utilities, common UI patterns, and icons alongside its custom styles." aria-controls="frontend-tech-info" aria-pressed="false">Bootstrap</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="Chart.js" data-tech-type="JavaScript charting library" data-tech-description="A library for creating interactive charts in the browser. It visualizes campaign performance, response rates, customer segments, contact frequency, and other analytics." aria-controls="frontend-tech-info" aria-pressed="false">Chart.js</button>
+                  <div class="about-stack-info" id="frontend-tech-info" role="status" aria-live="polite">
+                    <strong>Select a frontend technology</strong>
+                    <p>Choose a badge to see what type of technology it is and how this project uses it.</p>
+                  </div>
+                </div>
+                <div class="about-stack-group">
+                  <span class="about-stack-label">Backend &amp; data</span>
+                  <button class="about-stack-tag" type="button" data-tech-name="Python" data-tech-type="Programming language" data-tech-description="A general-purpose programming language used for the backend and data analysis. In this project, Python powers the API, campaign analytics, and report generation." aria-controls="backend-tech-info" aria-pressed="false">Python</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="Flask" data-tech-type="Python web framework" data-tech-description="A lightweight framework for building web applications and APIs in Python. Flask provides the endpoints the dashboard uses to retrieve analytics and upload campaign data." aria-controls="backend-tech-info" aria-pressed="false">Flask</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="Pandas" data-tech-type="Data analysis library" data-tech-description="A Python library for working with structured data. It helps the backend read, validate, filter, group, and summarize campaign records." aria-controls="backend-tech-info" aria-pressed="false">Pandas</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="NumPy" data-tech-type="Numerical computing library" data-tech-description="A Python library for efficient numerical operations. It supports the calculations used in campaign analysis and statistical comparisons." aria-controls="backend-tech-info" aria-pressed="false">NumPy</button>
+                  <button class="about-stack-tag" type="button" data-tech-name="SQLite" data-tech-type="Relational database" data-tech-description="A lightweight database engine that stores data in a local file. This project uses SQLite to persist campaign records and make them available to backend queries." aria-controls="backend-tech-info" aria-pressed="false">SQLite</button>
+                  <div class="about-stack-info" id="backend-tech-info" role="status" aria-live="polite">
+                    <strong>Select a backend or data technology</strong>
+                    <p>Choose a badge to see what type of technology it is and how this project uses it.</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card about-project-card about-project-how-it-works">
+              <div class="card-header">
+                <h2 class="card-title"><i class="bi bi-arrow-left-right text-primary"></i> How It Works</h2>
+              </div>
+              <div class="card-body">
+                <ol class="about-flow-grid">
+                  <li class="about-flow-step">
+                    <span class="about-flow-number">01</span>
+                    <div>
+                      <h3>Choose your campaign data</h3>
+                      <p>Start with the included benchmark dataset or upload a campaign CSV to explore your own records.</p>
+                    </div>
+                  </li>
+                  <li class="about-flow-step">
+                    <span class="about-flow-number">02</span>
+                    <div>
+                      <h3>Process and analyze</h3>
+                      <p>When available, the Flask API validates and analyzes the data, with SQLite providing campaign record storage.</p>
+                    </div>
+                  </li>
+                  <li class="about-flow-step">
+                    <span class="about-flow-number">03</span>
+                    <div>
+                      <h3>Explore the results</h3>
+                      <p>Use dashboard filters, charts, and summaries to compare response rates across campaign and customer groups.</p>
+                    </div>
+                  </li>
+                </ol>
+                <div class="about-flow-note"><i class="bi bi-info-circle" aria-hidden="true"></i> If the backend is unavailable, the dashboard can use its in-browser benchmark data.</div>
+              </div>
+            </section>
           </div>
         </section>
 

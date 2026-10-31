@@ -14,6 +14,8 @@ const UIEngine = {
     this.bindUploadEvents();
     this.bindReportActions();
     this.bindMobileDrawer();
+    this.bindTopbarMenu();
+    this.bindTechnologyInfo();
     this.bindSettings();
     this.bindRoiEvents();
     this.bindPropensityEvents();
@@ -58,6 +60,59 @@ const UIEngine = {
         backdrop.classList.remove('show');
       });
     }
+  },
+
+  /**
+   * Topbar shortcuts menu dismissal
+   */
+  bindTopbarMenu() {
+    const menu = document.getElementById('topbar-overflow-menu');
+    const trigger = menu?.querySelector('summary');
+
+    if (!menu || !trigger) return;
+
+    menu.addEventListener('click', event => {
+      if (event.target instanceof Element && event.target.closest('.topbar-overflow-panel a')) {
+        menu.open = false;
+      }
+    });
+
+    document.addEventListener('click', event => {
+      if (!menu.contains(event.target)) menu.open = false;
+    });
+
+    menu.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        trigger.focus();
+      }
+    });
+  },
+
+  /**
+   * Interactive technology descriptions on the About page
+   */
+  bindTechnologyInfo() {
+    document.querySelectorAll('.about-stack-group').forEach(group => {
+      const buttons = group.querySelectorAll('.about-stack-tag');
+      const info = group.querySelector('.about-stack-info');
+
+      if (!info) return;
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+
+          const title = document.createElement('strong');
+          title.textContent = `${button.dataset.techName} — ${button.dataset.techType}`;
+
+          const description = document.createElement('p');
+          description.textContent = button.dataset.techDescription;
+
+          info.replaceChildren(title, description);
+        });
+      });
+    });
   },
 
   /**

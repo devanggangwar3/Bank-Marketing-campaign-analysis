@@ -309,6 +309,93 @@ html, body {
   gap: 1rem;
 }
 
+.topbar-overflow-menu {
+  position: relative;
+}
+
+.topbar-overflow-menu > summary {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--slate-600);
+  cursor: pointer;
+  list-style: none;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.topbar-overflow-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.topbar-overflow-menu > summary::marker {
+  content: "";
+}
+
+.topbar-overflow-menu > summary i {
+  font-size: 1.25rem;
+}
+
+.topbar-overflow-menu > summary:hover,
+.topbar-overflow-menu[open] > summary {
+  color: var(--primary-700);
+  border-color: var(--primary-100);
+  background: var(--primary-50);
+}
+
+.topbar-overflow-menu > summary:focus-visible,
+.topbar-overflow-panel a:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.3);
+  outline-offset: 2px;
+}
+
+.topbar-overflow-panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 1030;
+  min-width: 220px;
+  padding: 0.4rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  box-shadow: var(--shadow-lg);
+}
+
+.topbar-overflow-panel a {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--slate-700);
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.topbar-overflow-panel a:hover {
+  background: var(--slate-50);
+  color: var(--primary-700);
+}
+
+.topbar-overflow-panel a i {
+  width: 1rem;
+  color: var(--slate-500);
+  text-align: center;
+}
+
+.topbar-overflow-divider {
+  height: 1px;
+  margin: 0.35rem 0.5rem;
+  background: var(--border-color);
+}
+
 /* Quick Filter Dropdown in Topbar */
 .quick-date-filter {
   font-size: 0.82rem;

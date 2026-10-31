@@ -4,6 +4,7 @@
   "description": "Bank Marketing Campaign Analysis Dashboard - Business Intelligence frontend for campaign response rates, contact fatigue analytics, and customer segmentation.",
   "main": "server.js",
   "scripts": {
+    "frontend": "node server.js",
     "dev": "node server.js",
     "start": "node server.js",
     "backend": "python backend/app.py",

@@ -103,7 +103,7 @@ python backend/app.py
 
 ### Step 2: Start the Frontend (Terminal 2)
 ```powershell
-npm run dev
+npm run frontend
 ```
 - Runs at: `http://localhost:3000`
 - Automatically opens the dashboard in your default browser.

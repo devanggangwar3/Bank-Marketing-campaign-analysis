@@ -170,8 +170,511 @@
 }
 
 /* --------------------------------------------------------------------------
-   Executive Report Styles
+   About Project Styles
    -------------------------------------------------------------------------- */
+#view-about .view-title-group h1 {
+  color: #202124;
+  font-family: var(--font-family);
+  font-size: clamp(1.8rem, 3vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+#view-about .view-title-group p {
+  color: #5F6368;
+}
+
+.about-project-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: 190px;
+  margin-bottom: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid #E8EAED;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 95% 0%, rgba(66, 133, 244, 0.08), transparent 28%),
+    linear-gradient(115deg, #FFFFFF 0%, #FCFDFD 65%, #F4FAF8 100%);
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08), 0 4px 12px rgba(60, 64, 67, 0.04);
+}
+
+.about-project-icon {
+  display: flex;
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #DCEFE7;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #E8F5EF, #F3F8F5);
+  color: #16856B;
+  font-size: 1.7rem;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08);
+}
+
+.about-project-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #16856B;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-project-eyebrow::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34A780;
+  box-shadow: 0 0 0 4px rgba(52, 167, 128, 0.12);
+  content: "";
+}
+
+.about-project-hero h2 {
+  margin: 0.35rem 0 0.5rem;
+  color: #202124;
+  font-family: var(--font-family);
+  font-size: clamp(1.65rem, 3vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.about-project-hero p {
+  max-width: 760px;
+  margin: 0;
+  color: #5F6368;
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+
+.about-project-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0 0 1.5rem;
+}
+
+.about-project-meta-item {
+  position: relative;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
+  background: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.about-project-meta-item:hover {
+  transform: translateY(-2px);
+  border-color: #DADCE0;
+  box-shadow: 0 4px 12px rgba(60, 64, 67, 0.12);
+}
+
+.about-project-meta-item dt {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.25rem;
+  color: #5F6368;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.about-project-meta-item dt i {
+  color: #4285F4;
+  font-size: 0.85rem;
+}
+
+.about-project-meta-item dd {
+  margin: 0;
+  color: #202124;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.about-project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "purpose explore"
+    "roadmap roadmap"
+    "stack stack"
+    "how how";
+  align-items: start;
+  gap: 1rem;
+}
+
+.about-project-card {
+  overflow: hidden;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.about-project-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(60, 64, 67, 0.12);
+}
+
+.about-project-card .card-header {
+  padding: 1rem 1.25rem;
+  background: #FFFFFF;
+}
+
+.about-project-card .card-body {
+  padding: 1.25rem;
+  background: #FFFFFF;
+}
+
+.about-project-purpose {
+  grid-area: purpose;
+}
+
+.about-project-explore {
+  grid-area: explore;
+}
+
+.about-project-roadmap {
+  grid-area: roadmap;
+}
+
+.about-project-how-it-works {
+  grid-area: how;
+}
+
+.about-project-stack {
+  grid-area: stack;
+}
+
+.about-project-card .card-body > p {
+  margin-bottom: 0;
+  color: #5F6368;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.about-project-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-project-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  color: #3C4043;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.about-project-list i {
+  margin-top: 0.15rem;
+  color: #18866B;
+}
+
+.about-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-flow-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
+  background: #FFFFFF;
+}
+
+.about-flow-number {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #D2E3FC;
+  border-radius: 10px;
+  background: #E8F0FE;
+  color: #1967D2;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.about-flow-step h3 {
+  margin: 0.1rem 0 0.35rem;
+  color: #202124;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.about-flow-step p {
+  margin: 0;
+  color: #5F6368;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.about-flow-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  color: #5F6368;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.about-flow-note i {
+  margin-top: 0.1rem;
+  color: #4285F4;
+}
+
+.about-roadmap-list {
+  display: grid;
+  gap: 1.1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-roadmap-phase + .about-roadmap-phase {
+  margin: 0;
+  padding: 1.15rem;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
+  background: #F8F9FA;
+}
+
+.about-project-roadmap .card-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+  background: #FFFFFF;
+}
+
+.about-project-roadmap .card-body > .about-roadmap-phase:first-child {
+  padding: 1.15rem;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
+  background: #F8F9FA;
+}
+
+.about-roadmap-phase h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  color: #202124;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.about-roadmap-phase h3 i {
+  color: #4285F4;
+}
+
+.about-roadmap-intro {
+  min-height: 2.7em;
+  margin: 0.45rem 0 1.15rem;
+  color: #5F6368;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.about-roadmap-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.75rem;
+  border: 1px solid #E8EAED;
+  border-radius: 10px;
+  background: #FFFFFF;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.about-roadmap-list li:hover {
+  transform: translateX(2px);
+  border-color: #D2E3FC;
+}
+
+.about-roadmap-step {
+  display: inline-flex;
+  width: 1.8rem;
+  height: 1.8rem;
+  flex: 0 0 1.8rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #D2E3FC;
+  border-radius: 10px;
+  background: #E8F0FE;
+  color: #1967D2;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.about-roadmap-list strong {
+  color: #202124;
+  font-size: 0.87rem;
+}
+
+.about-roadmap-list p {
+  margin: 0.2rem 0 0;
+  color: #5F6368;
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+
+.about-stack-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #E8EAED;
+  border-radius: 12px;
+  background: #F8F9FA;
+}
+
+.about-project-stack .card-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.about-stack-group + .about-stack-group {
+  margin: 0;
+}
+
+.about-stack-group > .about-stack-label,
+.about-stack-group > .about-stack-info {
+  flex-basis: 100%;
+}
+
+.about-stack-label {
+  color: var(--slate-500);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.about-stack-info {
+  margin-top: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #E8EAED;
+  border-radius: 10px;
+  background: #FFFFFF;
+}
+
+.about-stack-info strong {
+  color: #202124;
+  font-size: 0.84rem;
+}
+
+.about-stack-info p {
+  margin: 0.25rem 0 0;
+  color: #5F6368;
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+
+.about-stack-tag {
+  appearance: none;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid #DADCE0;
+  border-radius: var(--radius-full);
+  background: #FFFFFF;
+  color: #3C4043;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.about-stack-tag:hover,
+.about-stack-tag[aria-pressed="true"] {
+  border-color: #AECBFA;
+  background: #E8F0FE;
+  color: #1967D2;
+}
+
+.about-stack-tag:focus-visible {
+  outline: 3px solid rgba(66, 133, 244, 0.28);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+  .about-project-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "purpose"
+      "explore"
+      "roadmap"
+      "stack"
+      "how";
+  }
+
+  .about-project-roadmap .card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .about-project-stack .card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .about-flow-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-project-meta {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .about-project-hero {
+    gap: 0.9rem;
+  }
+
+  .about-project-icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+    border-radius: 12px;
+    font-size: 1.4rem;
+  }
+
+  .about-project-roadmap .card-body,
+  .about-project-roadmap .card-body > .about-roadmap-phase:first-child,
+  .about-roadmap-phase + .about-roadmap-phase {
+    padding: 0.9rem;
+  }
+
+  .about-roadmap-list li {
+    gap: 0.65rem;
+    padding: 0.65rem;
+  }
+}
+
 .report-header-banner {
   background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
   border-radius: var(--radius-lg);

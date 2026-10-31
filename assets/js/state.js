@@ -24,8 +24,23 @@ class AppStateStore {
         contact: 'all',
         outcome: 'all', // 'all' | 'yes' | 'no'
         marital: 'all',
+        housing: 'all', // 'all' | 'yes' | 'no'
+        balanceTier: 'all', // 'all' | 'negative' | 'low' | 'mid' | 'high' | 'affluent'
         touches: 'all', // 'all' | '1' | '2' | '3' | '4+'
         searchQuery: ''
+      },
+
+      // ROI simulator parameters
+      roiParams: {
+        costPerContact: 4.50,
+        valuePerConversion: 200.0,
+        touchCap: 'all'
+      },
+
+      // Cohort comparison selection
+      cohortParams: {
+        cohortA: 'cellular',
+        cohortB: 'telephone'
       },
 
       // Backend API aggregated cache
@@ -37,7 +52,11 @@ class AppStateStore {
         segments: null,
         insights: null,
         tableRecords: null,
-        totalRecords: 0
+        totalRecords: 0,
+        roi: null,
+        balance: null,
+        propensity: null,
+        cohorts: null
       },
 
       // Table pagination and sorting
@@ -102,13 +121,18 @@ class AppStateStore {
       contact: this.state.filters.contact,
       outcome: this.state.filters.outcome,
       marital: this.state.filters.marital,
+      housing: this.state.filters.housing,
+      balance_tier: this.state.filters.balanceTier,
       touches: this.state.filters.touches,
       search: this.state.filters.searchQuery
     };
 
+    const roiP = this.state.roiParams;
+    const cohortP = this.state.cohortParams;
+
     try {
       // Parallel fetch for speed
-      const [dashRes, periodRes, channelRes, freqRes, segRes, insRes, recRes] = await Promise.all([
+      const [dashRes, periodRes, channelRes, freqRes, segRes, insRes, recRes, roiRes, balRes, propRes, cohortRes] = await Promise.all([
         ApiClient.fetchDashboard(f),
         ApiClient.fetchPeriodAnalytics(f),
         ApiClient.fetchChannelAnalytics(f),
@@ -121,7 +145,11 @@ class AppStateStore {
           this.state.table.sortColumn,
           this.state.table.sortDirection,
           f
-        )
+        ),
+        ApiClient.fetchRoiAnalytics(roiP.costPerContact, roiP.valuePerConversion, roiP.touchCap === 'all' ? null : roiP.touchCap, f),
+        ApiClient.fetchBalanceAnalytics(f),
+        ApiClient.fetchPropensityAnalytics(f),
+        ApiClient.fetchCohortComparison(cohortP.cohortA, cohortP.cohortB, f)
       ]);
 
       if (dashRes.ok && dashRes.data) {
@@ -145,6 +173,10 @@ class AppStateStore {
         this.state.apiData.tableRecords = recRes.data.records;
         this.state.apiData.totalRecords = recRes.data.totalRecords;
       }
+      if (roiRes.ok && roiRes.data) this.state.apiData.roi = roiRes.data;
+      if (balRes.ok && balRes.data) this.state.apiData.balance = balRes.data;
+      if (propRes.ok && propRes.data) this.state.apiData.propensity = propRes.data;
+      if (cohortRes.ok && cohortRes.data) this.state.apiData.cohorts = cohortRes.data;
     } catch (err) {
       console.error('Failed to sync with backend:', err);
     } finally {
@@ -184,6 +216,29 @@ class AppStateStore {
     }
   }
 
+  setRoiParams(cost, value, cap) {
+    if (cost !== undefined && cost !== null) this.state.roiParams.costPerContact = Number(cost);
+    if (value !== undefined && value !== null) this.state.roiParams.valuePerConversion = Number(value);
+    if (cap !== undefined && cap !== null) this.state.roiParams.touchCap = cap;
+
+    if (this.state.backendConnected) {
+      this.syncWithBackend();
+    } else {
+      this.notify('roi_changed');
+    }
+  }
+
+  setCohortSelection(cohortA, cohortB) {
+    if (cohortA) this.state.cohortParams.cohortA = cohortA;
+    if (cohortB) this.state.cohortParams.cohortB = cohortB;
+
+    if (this.state.backendConnected) {
+      this.syncWithBackend();
+    } else {
+      this.notify('cohort_changed');
+    }
+  }
+
   resetFilters(notify = true) {
     this.state.filters = {
       month: 'all',
@@ -192,6 +247,8 @@ class AppStateStore {
       contact: 'all',
       outcome: 'all',
       marital: 'all',
+      housing: 'all',
+      balanceTier: 'all',
       touches: 'all',
       searchQuery: ''
     };
@@ -214,6 +271,8 @@ class AppStateStore {
     if (f.contact !== 'all') count++;
     if (f.outcome !== 'all') count++;
     if (f.marital !== 'all') count++;
+    if (f.housing !== 'all') count++;
+    if (f.balanceTier !== 'all') count++;
     if (f.touches !== 'all') count++;
     if (f.searchQuery && f.searchQuery.trim().length > 0) count++;
     return count;
@@ -271,6 +330,17 @@ class AppStateStore {
       if (filters.contact !== 'all' && (item.contact || '').toLowerCase() !== filters.contact.toLowerCase()) return false;
       if (filters.outcome !== 'all' && (item.y || '').toLowerCase() !== filters.outcome.toLowerCase()) return false;
       if (filters.marital !== 'all' && (item.marital || '').toLowerCase() !== filters.marital.toLowerCase()) return false;
+      if (filters.housing !== 'all' && (item.housing || '').toLowerCase() !== filters.housing.toLowerCase()) return false;
+
+      if (filters.balanceTier !== 'all') {
+        const bal = Number(item.balance) || 0;
+        const bt = filters.balanceTier.toLowerCase();
+        if (bt === 'negative' && bal >= 0) return false;
+        if (bt === 'low' && (bal < 0 || bal > 1000)) return false;
+        if (bt === 'mid' && (bal <= 1000 || bal > 5000)) return false;
+        if (bt === 'high' && (bal <= 5000 || bal > 15000)) return false;
+        if (bt === 'affluent' && bal <= 15000) return false;
+      }
 
       if (filters.touches !== 'all') {
         const cmp = Number(item.campaign);
@@ -341,8 +411,21 @@ class AppStateStore {
     const safePage = Math.min(Math.max(1, currentPage), totalPages);
     const startIndex = (safePage - 1) * pageSize;
 
+    const sliced = sorted.slice(startIndex, startIndex + pageSize).map(r => {
+      if (!r.propensityTier && typeof AnalyticsEngine !== 'undefined') {
+        const scored = AnalyticsEngine.scoreSingleLead(r);
+        return {
+          ...r,
+          propensityPercent: scored.propensityPercent,
+          propensityTier: scored.tier,
+          propensityClass: scored.tierClass
+        };
+      }
+      return r;
+    });
+
     return {
-      records: sorted.slice(startIndex, startIndex + pageSize),
+      records: sliced,
       totalRecords,
       totalPages,
       currentPage: safePage,

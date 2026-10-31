@@ -101,6 +101,41 @@ const ApiClient = {
     return await this.request('/filters');
   },
 
+  // 8b. Analytics: Campaign ROI & Budget Simulator
+  async fetchRoiAnalytics(cost = 4.5, value = 200, touchCap = null, filters = {}) {
+    const qObj = { cost_per_contact: cost, value_per_conversion: value, ...filters };
+    if (touchCap !== null && touchCap !== undefined) qObj.touch_cap = touchCap;
+    const qs = this.buildQuery(qObj);
+    return await this.request(`/analytics/roi${qs}`);
+  },
+
+  // 8c. Analytics: Financial Balance Tiers
+  async fetchBalanceAnalytics(filters = {}) {
+    const qs = this.buildQuery(filters);
+    return await this.request(`/analytics/balance${qs}`);
+  },
+
+  // 8d. Analytics: Predictive Propensity Engine
+  async fetchPropensityAnalytics(filters = {}) {
+    const qs = this.buildQuery(filters);
+    return await this.request(`/analytics/propensity${qs}`);
+  },
+
+  // 8e. Propensity: Score Single Lead Profile
+  async scoreSingleLead(leadData) {
+    return await this.request('/analytics/propensity/score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(leadData)
+    });
+  },
+
+  // 8f. Analytics: Cohort A/B Comparison
+  async fetchCohortComparison(cohortA = 'cellular', cohortB = 'telephone', filters = {}) {
+    const qs = this.buildQuery({ cohortA, cohortB, ...filters });
+    return await this.request(`/analytics/cohort-compare${qs}`);
+  },
+
   // 9. Paginated & Sorted Records for Data Table
   async fetchRecords(page = 1, pageSize = 10, sortBy = 'id', sortDir = 'asc', filters = {}) {
     const queryObj = {

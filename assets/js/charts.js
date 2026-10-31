@@ -451,6 +451,201 @@ const ChartsEngine = {
     });
   },
 
+  /**
+   * 7. Campaign ROI & Touch Cap Scenarios Chart
+   */
+  renderRoiChart(canvasId, input) {
+    this.destroy(canvasId);
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const roiData = input && input.scenarios
+      ? input
+      : AnalyticsEngine.computeROISimulation(Array.isArray(input) ? input : []);
+
+    const scenarios = roiData.scenarios || [];
+    const labels = scenarios.map(s => s.name.replace(/\(.*?\)/g, '').trim());
+    const spends = scenarios.map(s => s.totalSpend);
+    const revenues = scenarios.map(s => s.grossRevenue);
+    const profits = scenarios.map(s => s.netProfit);
+
+    this.instances[canvasId] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Campaign Spend ($)',
+            data: spends,
+            backgroundColor: 'rgba(239, 68, 68, 0.85)',
+            borderRadius: 6,
+            maxBarThickness: 36
+          },
+          {
+            label: 'Gross Return ($)',
+            data: revenues,
+            backgroundColor: 'rgba(16, 185, 129, 0.85)',
+            borderRadius: 6,
+            maxBarThickness: 36
+          },
+          {
+            label: 'Net Profit ($)',
+            data: profits,
+            backgroundColor: 'rgba(59, 130, 246, 0.85)',
+            borderRadius: 6,
+            maxBarThickness: 36
+          }
+        ]
+      },
+      options: {
+        ...this.getDefaultOptions(),
+        plugins: {
+          ...this.getDefaultOptions().plugins,
+          tooltip: {
+            callbacks: {
+              label(context) {
+                return `${context.dataset.label}: $${context.parsed.y.toLocaleString()}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => `$${v.toLocaleString()}` }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+   * 8. Financial Balance Tiers & Conversion Chart
+   */
+  renderBalanceChart(canvasId, input) {
+    this.destroy(canvasId);
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const balanceData = input && input.tiers
+      ? input
+      : AnalyticsEngine.computeBalanceAnalysis(Array.isArray(input) ? input : []);
+
+    const tiers = balanceData.tiers || [];
+    const labels = tiers.map(t => t.label);
+    const rates = tiers.map(t => t.responseRate);
+    const totals = tiers.map(t => t.total);
+
+    this.instances[canvasId] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Conversion Rate (%)',
+            data: rates,
+            backgroundColor: 'rgba(22, 121, 107, 0.85)',
+            yAxisID: 'y',
+            borderRadius: 6,
+            maxBarThickness: 40
+          },
+          {
+            type: 'line',
+            label: 'Prospect Volume (N)',
+            data: totals,
+            borderColor: '#F59E0B',
+            backgroundColor: '#F59E0B',
+            borderWidth: 2,
+            pointRadius: 5,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        ...this.getDefaultOptions(),
+        plugins: {
+          ...this.getDefaultOptions().plugins,
+          tooltip: {
+            callbacks: {
+              label(context) {
+                if (context.dataset.type === 'line') {
+                  return `Prospects: ${context.parsed.y} customers`;
+                }
+                return `Conversion Rate: ${context.parsed.y}%`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            type: 'linear',
+            position: 'left',
+            beginAtZero: true,
+            ticks: { callback: v => `${v}%` }
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            grid: { display: false },
+            beginAtZero: true,
+            ticks: { callback: v => `${v}` }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+   * 9. Lead Propensity Distribution Chart
+   */
+  renderPropensityChart(canvasId, input) {
+    this.destroy(canvasId);
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const propData = input && input.distribution
+      ? input
+      : AnalyticsEngine.computePropensityAnalysis(Array.isArray(input) ? input : []);
+
+    const dist = propData.distribution || [];
+    const labels = dist.map(d => d.tier);
+    const actualRates = dist.map(d => d.actualConversionRate);
+    const volumes = dist.map(d => d.count);
+
+    this.instances[canvasId] = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Actual Conversion Rate (%)',
+            data: actualRates,
+            backgroundColor: [
+              'rgba(16, 185, 129, 0.85)', // High - green
+              'rgba(59, 130, 246, 0.85)', // Moderate - blue
+              'rgba(100, 116, 139, 0.65)'  // Low - gray
+            ],
+            borderRadius: 6,
+            maxBarThickness: 45
+          }
+        ]
+      },
+      options: {
+        ...this.getDefaultOptions(),
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            beginAtZero: true,
+            ticks: { callback: v => `${v}%` }
+          }
+        }
+      }
+    });
+  },
+
   renderAll(records) {
     this.renderPeriodChart('chart-period', records);
     this.renderChannelChart('chart-channel', records);
@@ -458,6 +653,9 @@ const ChartsEngine = {
     this.renderOutcomeChart('chart-outcome', 'doughnut-center-rate', records);
     this.renderJobSegmentChart('chart-job-segments', records);
     this.renderEducationHousingChart('chart-education-housing', records);
+    this.renderRoiChart('chart-roi-simulation', records);
+    this.renderBalanceChart('chart-balance-tiers', records);
+    this.renderPropensityChart('chart-propensity-dist', records);
   }
 };
 

@@ -366,6 +366,442 @@ const AnalyticsEngine = {
     }
 
     return insights;
+  },
+
+  /**
+   * 7. Campaign ROI & Budget Simulator (Client-side fallback)
+   */
+  computeROISimulation(records = [], costPerContact = 4.50, valuePerConversion = 200.0, touchCap = null) {
+    const totalCustomers = records.length;
+    costPerContact = Number(costPerContact) || 4.50;
+    valuePerConversion = Number(valuePerConversion) || 200.0;
+
+    const evalScenario = (cap, name) => {
+      let totContacts = 0;
+      let conversions = 0;
+
+      for (let i = 0; i < totalCustomers; i++) {
+        const r = records[i];
+        const actualTouches = Number(r.campaign) || 1;
+        const capped = cap ? Math.min(actualTouches, cap) : actualTouches;
+        totContacts += capped;
+
+        const isYes = (r.y || '').toLowerCase() === 'yes';
+        if (cap) {
+          if (actualTouches <= cap && isYes) conversions++;
+        } else {
+          if (isYes) conversions++;
+        }
+      }
+
+      const spend = Number((totContacts * costPerContact).toFixed(2));
+      const revenue = Number((conversions * valuePerConversion).toFixed(2));
+      const profit = Number((revenue - spend).toFixed(2));
+      const roi = spend > 0 ? Number(((profit / spend) * 100).toFixed(1)) : 0;
+      const cpa = conversions > 0 ? Number((spend / conversions).toFixed(2)) : 0;
+      const convRate = totalCustomers > 0 ? Number(((conversions / totalCustomers) * 100).toFixed(2)) : 0;
+
+      return {
+        name,
+        cap,
+        totalContacts: totContacts,
+        conversions,
+        conversionRate: convRate,
+        totalSpend: spend,
+        grossRevenue: revenue,
+        netProfit: profit,
+        roiPercent: roi,
+        cpa
+      };
+    };
+
+    const scenarios = [
+      evalScenario(null, 'Unlimited (Current Baseline)'),
+      evalScenario(3, 'Cap at 3 Touches (Optimal Cutoff)'),
+      evalScenario(2, 'Cap at 2 Touches (High Efficiency)'),
+      evalScenario(1, 'Single Touch Only (Conservative)')
+    ];
+
+    let activeCap = null;
+    let activeEval = scenarios[0];
+    if (touchCap !== null && touchCap !== undefined && String(touchCap).match(/^\d+$/)) {
+      activeCap = parseInt(touchCap, 10);
+      activeEval = evalScenario(activeCap, `Custom Cap (${activeCap} Touches)`);
+    }
+
+    let wastedContacts = 0;
+    for (let i = 0; i < totalCustomers; i++) {
+      const cmp = Number(records[i].campaign) || 1;
+      if (cmp > 3) wastedContacts += (cmp - 3);
+    }
+    const wastedSpend = Number((wastedContacts * costPerContact).toFixed(2));
+
+    return {
+      metrics: {
+        totalCustomers,
+        totalContacts: activeEval.totalContacts,
+        conversions: activeEval.conversions,
+        conversionRate: activeEval.conversionRate,
+        costPerContact,
+        valuePerConversion,
+        totalSpend: activeEval.totalSpend,
+        grossRevenue: activeEval.grossRevenue,
+        netProfit: activeEval.netProfit,
+        roiPercent: activeEval.roiPercent,
+        cpa: activeEval.cpa,
+        fatigueWastedContacts: wastedContacts,
+        fatigueWastedSpend: wastedSpend,
+        touchCap: activeCap
+      },
+      scenarios
+    };
+  },
+
+  /**
+   * 8. Financial Balance Tier Segmentation
+   */
+  computeBalanceAnalysis(records = []) {
+    const totalCustomers = records.length;
+    if (totalCustomers === 0) {
+      return { tiers: [], summary: { totalBalancePool: 0, avgBalance: 0, highVsLowRatio: 1.0 } };
+    }
+
+    const tiersDef = [
+      { key: 'negative', label: 'Negative / In Debt', min: -Infinity, max: -0.01 },
+      { key: 'low', label: 'Low Balance ($0-$1k)', min: 0, max: 1000 },
+      { key: 'mid', label: 'Mid Balance ($1k-$5k)', min: 1000.01, max: 5000 },
+      { key: 'high', label: 'High Balance ($5k-$15k)', min: 5000.01, max: 15000 },
+      { key: 'affluent', label: 'Affluent ($15k+)', min: 15000.01, max: Infinity }
+    ];
+
+    const stats = tiersDef.map(t => ({
+      ...t,
+      total: 0,
+      converted: 0,
+      declined: 0,
+      totalBalance: 0,
+      totalTouches: 0
+    }));
+
+    let grandBalance = 0;
+
+    records.forEach(r => {
+      const bal = Number(r.balance) || 0;
+      const cmp = Number(r.campaign) || 1;
+      const isYes = (r.y || '').toLowerCase() === 'yes';
+      grandBalance += bal;
+
+      const target = stats.find(t => bal >= t.min && bal <= t.max);
+      if (target) {
+        target.total++;
+        target.totalBalance += bal;
+        target.totalTouches += cmp;
+        if (isYes) target.converted++;
+        else target.declined++;
+      }
+    });
+
+    const tiers = stats.map(s => {
+      const rate = s.total > 0 ? (s.converted / s.total) * 100 : 0;
+      const avgBal = s.total > 0 ? Math.round(s.totalBalance / s.total) : 0;
+      const avgTouches = s.total > 0 ? Number((s.totalTouches / s.total).toFixed(1)) : 1.0;
+      return {
+        key: s.key,
+        label: s.label,
+        total: s.total,
+        converted: s.converted,
+        declined: s.declined,
+        responseRate: Number(rate.toFixed(1)),
+        avgBalance: avgBal,
+        totalBalance: Math.round(s.totalBalance),
+        avgTouches
+      };
+    });
+
+    const highTier = tiers.find(t => t.key === 'high') || { responseRate: 10 };
+    const lowTier = tiers.find(t => t.key === 'low') || { responseRate: 5 };
+    const ratio = Number((highTier.responseRate / Math.max(lowTier.responseRate, 0.1)).toFixed(1));
+
+    return {
+      tiers,
+      summary: {
+        totalBalancePool: Math.round(grandBalance),
+        avgBalance: Math.round(grandBalance / totalCustomers),
+        highVsLowRatio: ratio
+      }
+    };
+  },
+
+  /**
+   * 9. Single Lead Propensity Scoring
+   */
+  scoreSingleLead(lead = {}) {
+    let score = 0.10;
+
+    // Previous outcome
+    const poutcome = (lead.poutcome || '').toLowerCase();
+    if (poutcome === 'success') score += 0.42;
+    else if (poutcome === 'failure') score += 0.04;
+
+    // Housing loan
+    const housing = (lead.housing || '').toLowerCase();
+    if (housing === 'no') score += 0.08;
+    else if (housing === 'yes') score -= 0.05;
+
+    // Personal loan
+    const loan = (lead.loan || '').toLowerCase();
+    if (loan === 'no') score += 0.02;
+    else if (loan === 'yes') score -= 0.04;
+
+    // Channel
+    const contact = (lead.contact || '').toLowerCase();
+    if (contact === 'cellular') score += 0.06;
+    else if (contact === 'telephone') score -= 0.02;
+    else if (contact === 'unknown') score -= 0.06;
+
+    // Job
+    const job = (lead.job || '').toLowerCase();
+    if (['student', 'retired'].includes(job)) score += 0.16;
+    else if (job === 'management') score += 0.04;
+    else if (['blue-collar', 'services'].includes(job)) score -= 0.04;
+    else if (['entrepreneur', 'housemaid'].includes(job)) score -= 0.03;
+
+    // Age
+    const age = Number(lead.age) || 35;
+    if (age < 30) score += 0.07;
+    else if (age > 60) score += 0.12;
+
+    // Balance
+    const balance = Number(lead.balance) || 1000;
+    if (balance < 0) score -= 0.08;
+    else if (balance <= 1000) score -= 0.02;
+    else if (balance <= 5000) score += 0.05;
+    else if (balance <= 15000) score += 0.12;
+    else score += 0.18;
+
+    // Touches
+    const cmp = Number(lead.campaign) || 1;
+    if (cmp === 1) score += 0.03;
+    else if (cmp === 2) score += 0.01;
+    else if (cmp === 3) score -= 0.03;
+    else if (cmp >= 4) score -= 0.10;
+
+    const clamped = Math.max(0.02, Math.min(0.96, score));
+    const pct = Number((clamped * 100).toFixed(1));
+
+    let tier = 'Low Propensity';
+    let tierClass = 'badge-neutral';
+    let rec = 'Low responsiveness probability. Avoid costly telemarketing dials; cycle through low-cost automated email campaigns instead.';
+
+    if (pct >= 30.0) {
+      tier = 'High Propensity';
+      tierClass = 'badge-success';
+      rec = 'Prime conversion prospect. Recommend immediate priority cellular outreach with specialized high-yield term deposit offerings.';
+    } else if (pct >= 15.0) {
+      tier = 'Moderate Propensity';
+      tierClass = 'badge-primary';
+      rec = 'Moderate receptivity. Recommend introductory digital notification or SMS teaser before secondary outbound contact.';
+    }
+
+    return {
+      propensityPercent: pct,
+      tier,
+      tierClass,
+      expectedValue: Number((clamped * 200).toFixed(2)),
+      recommendation: rec
+    };
+  },
+
+  /**
+   * 10. Cohort-Wide Propensity Distribution
+   */
+  computePropensityAnalysis(records = []) {
+    const totalLeads = records.length;
+    if (totalLeads === 0) {
+      return { distribution: [], summary: { totalLeads: 0, highCount: 0, highShare: 0, actualHighConvRate: 0 } };
+    }
+
+    const counts = {
+      'High Propensity': { count: 0, converted: 0, badgeClass: 'badge-success' },
+      'Moderate Propensity': { count: 0, converted: 0, badgeClass: 'badge-primary' },
+      'Low Propensity': { count: 0, converted: 0, badgeClass: 'badge-neutral' }
+    };
+
+    records.forEach(r => {
+      const scored = this.scoreSingleLead(r);
+      const isYes = (r.y || '').toLowerCase() === 'yes';
+      if (counts[scored.tier]) {
+        counts[scored.tier].count++;
+        if (isYes) counts[scored.tier].converted++;
+      }
+    });
+
+    const dist = Object.entries(counts).map(([tier, data]) => {
+      const pct = Number(((data.count / totalLeads) * 100).toFixed(1));
+      const actualConv = data.count > 0 ? Number(((data.converted / data.count) * 100).toFixed(1)) : 0;
+      return {
+        tier,
+        count: data.count,
+        percentage: pct,
+        actualConversionRate: actualConv,
+        badgeClass: data.badgeClass
+      };
+    });
+
+    const high = counts['High Propensity'];
+    return {
+      distribution: dist,
+      summary: {
+        totalLeads,
+        highCount: high.count,
+        highShare: Number(((high.count / totalLeads) * 100).toFixed(1)),
+        actualHighConvRate: high.count > 0 ? Number(((high.converted / high.count) * 100).toFixed(1)) : 0
+      }
+    };
+  },
+
+  /**
+   * 11. Head-to-Head Cohort Comparison with Z-Test
+   */
+  computeCohortComparison(records = [], cohortAType = 'cellular', cohortBType = 'telephone') {
+    const filterPreset = (cType) => {
+      const c = (cType || '').toLowerCase().trim();
+      let sub = [];
+      let label = 'All Prospects';
+
+      if (c === 'cellular') {
+        sub = records.filter(r => (r.contact || '').toLowerCase() === 'cellular');
+        label = 'Cellular Mobile Outreach';
+      } else if (c === 'telephone') {
+        sub = records.filter(r => (r.contact || '').toLowerCase() === 'telephone');
+        label = 'Fixed Landline Telephone';
+      } else if (c === 'no_housing') {
+        sub = records.filter(r => (r.housing || '').toLowerCase() === 'no');
+        label = 'No Housing Debt / Mortgage';
+      } else if (c === 'has_housing') {
+        sub = records.filter(r => (r.housing || '').toLowerCase() === 'yes');
+        label = 'Active Housing Mortgage';
+      } else if (c === 'prev_success') {
+        sub = records.filter(r => (r.poutcome || '').toLowerCase() === 'success');
+        label = 'Prior Campaign Responders';
+      } else if (c === 'no_prev_contact') {
+        sub = records.filter(r => (r.poutcome || '').toLowerCase() !== 'success');
+        label = 'Cold / No Prior Success';
+      } else if (c === 'high_balance') {
+        sub = records.filter(r => (Number(r.balance) || 0) > 2500);
+        label = 'High Balance (> $2,500)';
+      } else if (c === 'low_balance') {
+        sub = records.filter(r => (Number(r.balance) || 0) <= 1000);
+        label = 'Low Balance (<= $1,000)';
+      } else if (c === 'youth_senior') {
+        sub = records.filter(r => {
+          const a = Number(r.age) || 40;
+          return a < 30 || a > 60;
+        });
+        label = 'Young (<30) & Senior (>60)';
+      } else if (c === 'middle_aged') {
+        sub = records.filter(r => {
+          const a = Number(r.age) || 40;
+          return a >= 30 && a <= 60;
+        });
+        label = 'Middle-Aged (30 - 60 Years)';
+      } else {
+        sub = records;
+        label = 'All Prospects';
+      }
+      return { sub, label };
+    };
+
+    const cA = filterPreset(cohortAType);
+    const cB = filterPreset(cohortBType);
+
+    const getStats = (sub, name, key) => {
+      const n = sub.length;
+      if (n === 0) {
+        return { key, name, count: 0, conversions: 0, conversionRate: 0, avgTouches: 0, avgDuration: 0, avgBalance: 0 };
+      }
+      let conv = 0;
+      let totTouches = 0;
+      let totDur = 0;
+      let totBal = 0;
+      sub.forEach(r => {
+        if ((r.y || '').toLowerCase() === 'yes') conv++;
+        totTouches += Number(r.campaign) || 1;
+        totDur += Number(r.duration) || 0;
+        totBal += Number(r.balance) || 0;
+      });
+      return {
+        key,
+        name,
+        count: n,
+        conversions: conv,
+        conversionRate: Number(((conv / n) * 100).toFixed(2)),
+        avgTouches: Number((totTouches / n).toFixed(1)),
+        avgDuration: Math.round(totDur / n),
+        avgBalance: Math.round(totBal / n)
+      };
+    };
+
+    const resA = getStats(cA.sub, cA.label, cohortAType);
+    const resB = getStats(cB.sub, cB.label, cohortBType);
+
+    const n1 = resA.count;
+    const n2 = resB.count;
+    const x1 = resA.conversions;
+    const x2 = resB.conversions;
+
+    const absDiff = Number((resA.conversionRate - resB.conversionRate).toFixed(2));
+    const relLift = resB.conversionRate > 0
+      ? Number((((resA.conversionRate - resB.conversionRate) / resB.conversionRate) * 100).toFixed(1))
+      : 0;
+
+    let zScore = 0;
+    let pValue = 1.0;
+    let isSignificant = false;
+    let sigLabel = 'Insufficient Sample Size';
+
+    if (n1 >= 10 && n2 >= 10) {
+      const pPooled = (x1 + x2) / (n1 + n2);
+      if (pPooled > 0 && pPooled < 1) {
+        const se = Math.sqrt(pPooled * (1 - pPooled) * (1 / n1 + 1 / n2));
+        if (se > 0) {
+          const p1 = x1 / n1;
+          const p2 = x2 / n2;
+          zScore = Number(((p1 - p2) / se).toFixed(3));
+          // Approximate erf for two-tailed p-value
+          const absZ = Math.abs(zScore);
+          // Standard numerical approximation of erf
+          const t = 1.0 / (1.0 + 0.3275911 * (absZ / Math.SQRT2));
+          const poly = ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t;
+          const erfVal = 1.0 - poly * Math.exp(-0.5 * absZ * absZ);
+          pValue = Number(Math.max(0, 1.0 - erfVal).toFixed(4));
+
+          if (absZ >= 2.576) {
+            isSignificant = true;
+            sigLabel = `Statistically Significant (p < 0.01, 99% Confidence, Z = ${zScore})`;
+          } else if (absZ >= 1.96) {
+            isSignificant = true;
+            sigLabel = `Statistically Significant (p < 0.05, 95% Confidence, Z = ${zScore})`;
+          } else {
+            isSignificant = false;
+            sigLabel = `Not Statistically Significant (p = ${pValue}, Z = ${zScore})`;
+          }
+        }
+      }
+    }
+
+    return {
+      cohortA: resA,
+      cohortB: resB,
+      comparison: {
+        absoluteDifference: absDiff,
+        relativeLift: relLift,
+        zScore,
+        pValue,
+        isSignificant,
+        significanceLabel: sigLabel
+      }
+    };
   }
 };
 

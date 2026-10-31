@@ -15,6 +15,10 @@ const UIEngine = {
     this.bindReportActions();
     this.bindMobileDrawer();
     this.bindSettings();
+    this.bindRoiEvents();
+    this.bindPropensityEvents();
+    this.bindCohortEvents();
+    this.bindExportLeadsAction();
   },
 
   /**
@@ -67,6 +71,8 @@ const UIEngine = {
       { id: 'filter-contact', key: 'contact' },
       { id: 'filter-outcome', key: 'outcome' },
       { id: 'filter-marital', key: 'marital' },
+      { id: 'filter-housing', key: 'housing' },
+      { id: 'filter-balance', key: 'balanceTier' },
       { id: 'filter-touches', key: 'touches' }
     ];
 
@@ -122,7 +128,7 @@ const UIEngine = {
   },
 
   resetFilterFormValues() {
-    const selects = ['filter-month', 'filter-job', 'filter-education', 'filter-contact', 'filter-outcome', 'filter-marital', 'filter-touches', 'topbar-quick-month'];
+    const selects = ['filter-month', 'filter-job', 'filter-education', 'filter-contact', 'filter-outcome', 'filter-marital', 'filter-housing', 'filter-balance', 'filter-touches', 'topbar-quick-month'];
     selects.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = 'all';
@@ -658,6 +664,11 @@ const UIEngine = {
         ? `<span class="badge badge-success"><i class="bi bi-check-circle-fill"></i> Subscribed</span>`
         : `<span class="badge badge-neutral"><i class="bi bi-dash-circle"></i> Declined</span>`;
 
+      const pScore = r.propensityPercent !== undefined ? r.propensityPercent : 15;
+      const pTier = r.propensityTier || (pScore >= 30 ? 'High' : (pScore >= 15 ? 'Moderate' : 'Low'));
+      const pClass = r.propensityClass || (pScore >= 30 ? 'badge-success' : (pScore >= 15 ? 'badge-primary' : 'badge-neutral'));
+      const propBadge = `<span class="badge ${pClass}" title="Predicted propensity">${pTier} (${pScore}%)</span>`;
+
       return `
         <tr>
           <td><span class="font-monospace text-muted">#${r.id || '-'}</span></td>
@@ -669,6 +680,7 @@ const UIEngine = {
           <td><span class="text-capitalize">${r.contact}</span></td>
           <td><span class="badge badge-info">${r.campaign} ${r.campaign === 1 ? 'touch' : 'touches'}</span></td>
           <td>${Math.round(r.duration / 60)}m ${r.duration % 60}s</td>
+          <td>${propBadge}</td>
           <td>${outcomeBadge}</td>
         </tr>
       `;
@@ -759,6 +771,337 @@ const UIEngine = {
         month: 'long',
         day: 'numeric'
       });
+    }
+
+    // Update ROI metric indicators in report if available
+    const roiMetrics = state.apiData.roi ? state.apiData.roi.metrics : (typeof AnalyticsEngine !== 'undefined' ? AnalyticsEngine.computeROISimulation(appState.getFilteredDataset()).metrics : null);
+    if (roiMetrics) {
+      const repSpend = document.getElementById('report-meta-spend');
+      const repProfit = document.getElementById('report-meta-profit');
+      const repRoi = document.getElementById('report-meta-roi');
+      if (repSpend) repSpend.textContent = `$${roiMetrics.totalSpend.toLocaleString()}`;
+      if (repProfit) repProfit.textContent = `$${roiMetrics.netProfit.toLocaleString()}`;
+      if (repRoi) repRoi.textContent = `${roiMetrics.roiPercent}%`;
+    }
+  },
+
+  /**
+   * Bind ROI Simulator Controls
+   */
+  bindRoiEvents() {
+    const costSlider = document.getElementById('roi-cost-slider');
+    const costInput = document.getElementById('roi-cost-input');
+    const valueSlider = document.getElementById('roi-value-slider');
+    const valueInput = document.getElementById('roi-value-input');
+    const touchCapSelect = document.getElementById('roi-touch-cap');
+
+    if (costSlider && costInput) {
+      costSlider.addEventListener('input', e => {
+        costInput.value = e.target.value;
+        appState.setRoiParams(e.target.value, undefined, undefined);
+      });
+      costInput.addEventListener('change', e => {
+        costSlider.value = e.target.value;
+        appState.setRoiParams(e.target.value, undefined, undefined);
+      });
+    }
+
+    if (valueSlider && valueInput) {
+      valueSlider.addEventListener('input', e => {
+        valueInput.value = e.target.value;
+        appState.setRoiParams(undefined, e.target.value, undefined);
+      });
+      valueInput.addEventListener('change', e => {
+        valueSlider.value = e.target.value;
+        appState.setRoiParams(undefined, e.target.value, undefined);
+      });
+    }
+
+    if (touchCapSelect) {
+      touchCapSelect.addEventListener('change', e => {
+        appState.setRoiParams(undefined, undefined, e.target.value);
+      });
+    }
+  },
+
+  /**
+   * Bind Interactive Lead Propensity Sandbox Calculator
+   */
+  bindPropensityEvents() {
+    const form = document.getElementById('calc-lead-form');
+    if (!form) return;
+
+    const computeScore = async () => {
+      const leadData = {
+        age: Number(document.getElementById('calc-age')?.value) || 35,
+        job: document.getElementById('calc-job')?.value || 'management',
+        marital: document.getElementById('calc-marital')?.value || 'married',
+        education: document.getElementById('calc-education')?.value || 'tertiary',
+        balance: Number(document.getElementById('calc-balance')?.value) || 2000,
+        housing: document.getElementById('calc-housing')?.value || 'no',
+        loan: document.getElementById('calc-loan')?.value || 'no',
+        contact: document.getElementById('calc-contact')?.value || 'cellular',
+        poutcome: document.getElementById('calc-poutcome')?.value || 'unknown',
+        campaign: Number(document.getElementById('calc-touches')?.value) || 1
+      };
+
+      let result;
+      if (appState.state.backendConnected) {
+        const res = await ApiClient.scoreSingleLead(leadData);
+        result = res.ok && res.data ? res.data : AnalyticsEngine.scoreSingleLead(leadData);
+      } else {
+        result = AnalyticsEngine.scoreSingleLead(leadData);
+      }
+
+      const scoreEl = document.getElementById('calc-score-val');
+      const badgeEl = document.getElementById('calc-tier-badge');
+      const expectedEl = document.getElementById('calc-expected-val');
+      const recEl = document.getElementById('calc-rec-text');
+
+      if (scoreEl) scoreEl.textContent = `${result.propensityPercent}%`;
+      if (badgeEl) {
+        badgeEl.textContent = result.tier;
+        badgeEl.className = `calc-tier-badge ${result.tierClass || 'badge-success'}`;
+      }
+      if (expectedEl) expectedEl.textContent = `$${result.expectedValue}`;
+      if (recEl) recEl.textContent = result.recommendation;
+    };
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      computeScore();
+    });
+
+    form.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', computeScore);
+    });
+
+    // Run initial calculation
+    setTimeout(computeScore, 100);
+  },
+
+  /**
+   * Bind Cohort A/B Comparison Selection
+   */
+  bindCohortEvents() {
+    const selectA = document.getElementById('cohort-a-select');
+    const selectB = document.getElementById('cohort-b-select');
+
+    if (selectA) {
+      selectA.addEventListener('change', e => {
+        appState.setCohortSelection(e.target.value, null);
+      });
+    }
+
+    if (selectB) {
+      selectB.addEventListener('change', e => {
+        appState.setCohortSelection(null, e.target.value);
+      });
+    }
+  },
+
+  /**
+   * Bind High-Propensity Leads CSV Exporter
+   */
+  bindExportLeadsAction() {
+    const btn = document.getElementById('btn-export-priority-leads');
+    if (!btn) return;
+
+    btn.addEventListener('click', () => {
+      const dataset = appState.getFilteredDataset();
+      const highLeads = dataset.filter(r => {
+        const scored = AnalyticsEngine.scoreSingleLead(r);
+        return scored.propensityPercent >= 30.0;
+      });
+
+      if (highLeads.length === 0) {
+        this.showToast('No Priority Leads', 'No leads meet the high-propensity threshold under current filters.', 'warning');
+        return;
+      }
+
+      CSVEngine.exportRecordsToCsv(highLeads, `high_propensity_leads_${new Date().toISOString().slice(0, 10)}.csv`);
+      this.showToast('Priority Leads Exported', `Exported ${highLeads.length.toLocaleString()} high-propensity prospects to CSV.`, 'success');
+    });
+  },
+
+  /**
+   * Render ROI & Budget Simulator View
+   */
+  renderRoiView(roiData) {
+    if (!roiData || !roiData.metrics) return;
+    const m = roiData.metrics;
+
+    const elSpend = document.getElementById('roi-val-spend');
+    const elRevenue = document.getElementById('roi-val-revenue');
+    const elProfit = document.getElementById('roi-val-profit');
+    const elRoi = document.getElementById('roi-val-roi');
+    const elCpa = document.getElementById('roi-val-cpa');
+    const elSavings = document.getElementById('roi-val-fatigue-savings');
+
+    if (elSpend) elSpend.textContent = `$${m.totalSpend.toLocaleString()}`;
+    if (elRevenue) elRevenue.textContent = `$${m.grossRevenue.toLocaleString()}`;
+    if (elProfit) {
+      elProfit.textContent = `$${m.netProfit.toLocaleString()}`;
+      elProfit.className = m.netProfit >= 0 ? 'fs-3 fw-bold text-success mt-1' : 'fs-3 fw-bold text-danger mt-1';
+    }
+    if (elRoi) elRoi.textContent = `${m.roiPercent}%`;
+    if (elCpa) elCpa.textContent = `$${m.cpa}`;
+    if (elSavings) elSavings.textContent = `$${m.fatigueWastedSpend.toLocaleString()}`;
+
+    // Render Scenarios Table
+    const tbody = document.getElementById('roi-scenarios-table-body');
+    if (tbody && roiData.scenarios) {
+      tbody.innerHTML = roiData.scenarios.map(s => {
+        const isCurrent = (m.touchCap === null && s.cap === null) || (m.touchCap === s.cap);
+        const rowClass = isCurrent ? 'table-primary fw-semibold' : '';
+        return `
+          <tr class="${rowClass}">
+            <td><strong>${s.name}</strong> ${isCurrent ? '<span class="badge badge-primary ms-1">Active Policy</span>' : ''}</td>
+            <td>${s.totalContacts.toLocaleString()}</td>
+            <td>${s.conversions.toLocaleString()} (${s.conversionRate}%)</td>
+            <td>$${s.totalSpend.toLocaleString()}</td>
+            <td>$${s.grossRevenue.toLocaleString()}</td>
+            <td class="${s.netProfit >= 0 ? 'text-success' : 'text-danger'} fw-bold">$${s.netProfit.toLocaleString()}</td>
+            <td><span class="badge ${s.roiPercent >= 100 ? 'badge-success' : (s.roiPercent > 0 ? 'badge-info' : 'badge-danger')}">${s.roiPercent}%</span></td>
+            <td>$${s.cpa}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  },
+
+  /**
+   * Render Financial Balance Tiers View
+   */
+  renderBalanceView(balanceData) {
+    if (!balanceData || !balanceData.summary) return;
+    const s = balanceData.summary;
+
+    const elPool = document.getElementById('balance-pool-val');
+    const elAvg = document.getElementById('balance-avg-val');
+    const elRatio = document.getElementById('balance-multiplier-val');
+
+    if (elPool) elPool.textContent = `$${s.totalBalancePool.toLocaleString()}`;
+    if (elAvg) elAvg.textContent = `$${s.avgBalance.toLocaleString()}`;
+    if (elRatio) elRatio.textContent = `${s.highVsLowRatio}x`;
+
+    const tbody = document.getElementById('balance-tiers-table-body');
+    if (tbody && balanceData.tiers) {
+      tbody.innerHTML = balanceData.tiers.map(t => `
+        <tr>
+          <td><strong>${t.label}</strong></td>
+          <td>${t.total.toLocaleString()} prospects</td>
+          <td>${t.converted.toLocaleString()} (${t.responseRate}%)</td>
+          <td>$${t.avgBalance.toLocaleString()}</td>
+          <td>$${t.totalBalance.toLocaleString()}</td>
+          <td>${t.avgTouches} dials</td>
+        </tr>
+      `).join('');
+    }
+  },
+
+  /**
+   * Render Lead Propensity Scoring View
+   */
+  renderPropensityView(propData) {
+    if (!propData || !propData.summary) return;
+    const s = propData.summary;
+
+    const elHighCount = document.getElementById('prop-high-count');
+    const elHighRate = document.getElementById('prop-high-rate');
+    const elMidCount = document.getElementById('prop-mid-count');
+    const elMidRate = document.getElementById('prop-mid-rate');
+    const elLowCount = document.getElementById('prop-low-count');
+    const elLowRate = document.getElementById('prop-low-rate');
+
+    const dist = propData.distribution || [];
+    const high = dist.find(d => d.tier === 'High Propensity') || { count: 0, actualConversionRate: 0, percentage: 0 };
+    const mid = dist.find(d => d.tier === 'Moderate Propensity') || { count: 0, actualConversionRate: 0, percentage: 0 };
+    const low = dist.find(d => d.tier === 'Low Propensity') || { count: 0, actualConversionRate: 0, percentage: 0 };
+
+    if (elHighCount) elHighCount.textContent = `${high.count.toLocaleString()} (${high.percentage}%)`;
+    if (elHighRate) elHighRate.textContent = `${high.actualConversionRate}%`;
+    if (elMidCount) elMidCount.textContent = `${mid.count.toLocaleString()} (${mid.percentage}%)`;
+    if (elMidRate) elMidRate.textContent = `${mid.actualConversionRate}%`;
+    if (elLowCount) elLowCount.textContent = `${low.count.toLocaleString()} (${low.percentage}%)`;
+    if (elLowRate) elLowRate.textContent = `${low.actualConversionRate}%`;
+
+    const tbody = document.getElementById('prop-table-body');
+    if (tbody) {
+      tbody.innerHTML = dist.map(d => `
+        <tr>
+          <td><span class="badge ${d.badgeClass}">${d.tier}</span></td>
+          <td>${d.count.toLocaleString()} prospects</td>
+          <td>${d.percentage}%</td>
+          <td><strong>${d.actualConversionRate}%</strong></td>
+        </tr>
+      `).join('');
+    }
+  },
+
+  /**
+   * Render Cohort A/B Comparison View
+   */
+  renderCohortComparisonView(cohortData) {
+    if (!cohortData || !cohortData.comparison) return;
+    const a = cohortData.cohortA;
+    const b = cohortData.cohortB;
+    const comp = cohortData.comparison;
+
+    const nameA = document.querySelectorAll('.cohort-a-name-display');
+    const nameB = document.querySelectorAll('.cohort-b-name-display');
+    nameA.forEach(el => el.textContent = a.name || 'Cohort A');
+    nameB.forEach(el => el.textContent = b.name || 'Cohort B');
+
+    // Values in head-to-head table
+    const elSizeA = document.getElementById('cohort-a-size');
+    const elSizeB = document.getElementById('cohort-b-size');
+    const elConvA = document.getElementById('cohort-a-conv');
+    const elConvB = document.getElementById('cohort-b-conv');
+    const elRateA = document.getElementById('cohort-a-rate');
+    const elRateB = document.getElementById('cohort-b-rate');
+    const elTouchesA = document.getElementById('cohort-a-touches');
+    const elTouchesB = document.getElementById('cohort-b-touches');
+    const elDurA = document.getElementById('cohort-a-dur');
+    const elDurB = document.getElementById('cohort-b-dur');
+    const elBalA = document.getElementById('cohort-a-bal');
+    const elBalB = document.getElementById('cohort-b-bal');
+
+    if (elSizeA) elSizeA.textContent = a.count.toLocaleString();
+    if (elSizeB) elSizeB.textContent = b.count.toLocaleString();
+    if (elConvA) elConvA.textContent = a.conversions.toLocaleString();
+    if (elConvB) elConvB.textContent = b.conversions.toLocaleString();
+    if (elRateA) elRateA.textContent = `${a.conversionRate}%`;
+    if (elRateB) elRateB.textContent = `${b.conversionRate}%`;
+    if (elTouchesA) elTouchesA.textContent = a.avgTouches;
+    if (elTouchesB) elTouchesB.textContent = b.avgTouches;
+    if (elDurA) elDurA.textContent = `${Math.floor(a.avgDuration / 60)}m ${a.avgDuration % 60}s`;
+    if (elDurB) elDurB.textContent = `${Math.floor(b.avgDuration / 60)}m ${b.avgDuration % 60}s`;
+    if (elBalA) elBalA.textContent = `$${a.avgBalance.toLocaleString()}`;
+    if (elBalB) elBalB.textContent = `$${b.avgBalance.toLocaleString()}`;
+
+    // Uplift and significance
+    const elDiff = document.getElementById('cohort-metric-diff');
+    const elLift = document.getElementById('cohort-metric-lift');
+    if (elDiff) elDiff.textContent = `${comp.absoluteDifference >= 0 ? '+' : ''}${comp.absoluteDifference}%`;
+    if (elLift) elLift.textContent = `${comp.relativeLift >= 0 ? '+' : ''}${comp.relativeLift}%`;
+
+    const banner = document.getElementById('cohort-sig-banner');
+    if (banner) {
+      banner.className = `sig-banner ${comp.isSignificant ? 'significant' : 'insignificant'}`;
+      banner.innerHTML = `
+        <div>
+          <div class="fw-bold mb-1">
+            <i class="bi ${comp.isSignificant ? 'bi-patch-check-fill text-success' : 'bi-info-circle-fill text-warning'} me-1"></i>
+            ${comp.isSignificant ? 'Statistically Significant Outcome' : 'Inconclusive / Neutral Variance'}
+          </div>
+          <div class="small">${comp.significanceLabel}</div>
+        </div>
+        <div class="text-end font-monospace small">
+          <div>Z-Score: <strong>${comp.zScore}</strong></div>
+          <div>p-value: <strong>${comp.pValue}</strong></div>
+        </div>
+      `;
     }
   },
 

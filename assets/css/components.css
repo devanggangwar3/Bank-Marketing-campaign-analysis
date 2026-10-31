@@ -828,3 +828,130 @@
   max-width: 400px;
   margin-bottom: 1.25rem;
 }
+
+/* --------------------------------------------------------------------------
+   Simulator & Calculator Controls
+   -------------------------------------------------------------------------- */
+.simulator-panel {
+  background-color: var(--slate-50);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.simulator-param-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.simulator-param-item {
+  flex: 1 1 240px;
+}
+
+.simulator-param-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--navy-900);
+  margin-bottom: 0.35rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-range {
+  width: 100%;
+  accent-color: var(--primary-600);
+  cursor: pointer;
+}
+
+.calculator-result-card {
+  background: linear-gradient(145deg, #0B1528, #16243E);
+  color: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.calc-score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.calc-score-number {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #34D399;
+}
+
+.calc-tier-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.calc-rec-box {
+  background-color: rgba(255, 255, 255, 0.07);
+  border-left: 3px solid #34D399;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.85rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #E2E8F0;
+}
+
+/* --------------------------------------------------------------------------
+   Cohort Head-to-Head Comparison
+   -------------------------------------------------------------------------- */
+.cohort-vs-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 1.25rem 0;
+}
+
+.cohort-vs-badge {
+  background: var(--navy-900);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--slate-100);
+}
+
+.sig-banner {
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+}
+
+.sig-banner.significant {
+  background-color: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #065F46;
+}
+
+.sig-banner.insignificant {
+  background-color: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+}

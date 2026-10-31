@@ -25,50 +25,8 @@
 </head>
 <body>
 
-  <main class="login-screen" id="login-screen" aria-labelledby="login-title">
-    <section class="login-brand-panel">
-      <div class="brand-wrapper login-brand">
-        <div class="brand-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></div>
-        <div class="brand-text">
-          <span class="brand-title">BankPulse BI</span>
-          <span class="brand-subtitle">Marketing Intelligence</span>
-        </div>
-      </div>
-
-      <div class="login-brand-copy">
-        <span class="login-eyebrow">Campaign intelligence workspace</span>
-        <h1>See the signal behind every campaign.</h1>
-        <p>Bring response trends, customer segments and outreach performance into one clear view.</p>
-      </div>
-
-      <div class="login-brand-footer">BankPulse BI <span>·</span> Campaign Team</div>
-    </section>
-
-    <section class="login-form-panel">
-      <div class="login-form-wrap">
-        <div class="login-mode"><span></span> Demo workspace</div>
-        <h2 id="login-title">Welcome back</h2>
-        <p class="login-intro">Enter demo details to open the campaign dashboard.</p>
-
-        <form id="login-form">
-          <div class="login-field">
-            <label for="login-email">Email address</label>
-            <input id="login-email" type="email" autocomplete="off" placeholder="analyst@example.com" required>
-          </div>
-          <div class="login-field">
-            <label for="login-passcode">Passcode</label>
-            <input id="login-passcode" type="password" autocomplete="off" placeholder="Enter any demo value" required>
-          </div>
-          <button class="login-submit" type="submit">Continue to dashboard <i class="bi bi-arrow-right" aria-hidden="true"></i></button>
-        </form>
-
-        <p class="login-disclaimer"><i class="bi bi-info-circle" aria-hidden="true"></i> Demo only. Values are not verified, sent or stored. Do not use real credentials.</p>
-      </div>
-    </section>
-  </main>
-
   <!-- Application Shell -->
-  <div class="app-container" aria-hidden="true">
+  <div class="app-container">
 
     <!-- Mobile Sidebar Backdrop -->
     <div class="sidebar-backdrop"></div>
@@ -100,6 +58,21 @@
         <a class="sidebar-nav-link" data-view-target="segments" id="nav-segments">
           <i class="bi bi-people-fill"></i>
           <span>Customer Segments</span>
+        </a>
+        <a class="sidebar-nav-link" data-view-target="roi" id="nav-roi">
+          <i class="bi bi-currency-dollar"></i>
+          <span>ROI & Budget Simulator</span>
+          <span class="sidebar-nav-badge badge-primary">Model</span>
+        </a>
+        <a class="sidebar-nav-link" data-view-target="propensity" id="nav-propensity">
+          <i class="bi bi-bullseye"></i>
+          <span>Lead Propensity & Scoring</span>
+          <span class="sidebar-nav-badge badge-warning">Predict</span>
+        </a>
+        <a class="sidebar-nav-link" data-view-target="cohort" id="nav-cohort">
+          <i class="bi bi-sliders"></i>
+          <span>Cohort A/B Comparison</span>
+          <span class="sidebar-nav-badge badge-info">Z-Test</span>
         </a>
 
         <div class="nav-section-title mt-3">Data Operations</div>
@@ -276,6 +249,37 @@
                   <option value="all">All Outcomes</option>
                   <option value="yes">Subscribed (Yes)</option>
                   <option value="no">Declined (No)</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-marital">Marital Status</label>
+                <select class="form-select" id="filter-marital">
+                  <option value="all">All Statuses</option>
+                  <option value="married">Married</option>
+                  <option value="single">Single</option>
+                  <option value="divorced">Divorced</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-housing">Housing Loan Debt</label>
+                <select class="form-select" id="filter-housing">
+                  <option value="all">All Profiles</option>
+                  <option value="no">No Housing Debt</option>
+                  <option value="yes">Has Housing Loan</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label class="filter-label" for="filter-balance">Balance Bracket</label>
+                <select class="form-select" id="filter-balance">
+                  <option value="all">All Balances</option>
+                  <option value="negative">Negative (&lt; $0)</option>
+                  <option value="low">Low ($0 - $1k)</option>
+                  <option value="mid">Mid ($1k - $5k)</option>
+                  <option value="high">High ($5k - $15k)</option>
+                  <option value="affluent">Affluent ($15k+)</option>
                 </select>
               </div>
 
@@ -563,6 +567,485 @@
               </div>
             </div>
           </div>
+
+          <!-- Financial Balance Brackets Card -->
+          <div class="card mt-4">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title"><i class="bi bi-wallet2 text-primary"></i> Customer Account Balance Tiers &amp; Liquidity</h2>
+                <div class="card-subtitle">Correlation between customer deposit balance brackets and campaign conversion propensity</div>
+              </div>
+              <span class="badge badge-success">Liquidity Index</span>
+            </div>
+            <div class="card-body">
+              <!-- Summary KPIs -->
+              <div class="row g-3 mb-4">
+                <div class="col-sm-4">
+                  <div class="card p-3 bg-slate-50 border-0">
+                    <div class="text-muted small fw-semibold text-uppercase">Total Balance Pool</div>
+                    <div class="fs-4 fw-bold text-navy-950 mt-1" id="balance-pool-val">--</div>
+                    <div class="text-muted small mt-1">Aggregated customer deposits</div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="card p-3 bg-slate-50 border-0">
+                    <div class="text-muted small fw-semibold text-uppercase">Avg Account Balance</div>
+                    <div class="fs-4 fw-bold text-navy-950 mt-1" id="balance-avg-val">--</div>
+                    <div class="text-muted small mt-1">Per prospect across active cohort</div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="card p-3 bg-slate-50 border-0">
+                    <div class="text-muted small fw-semibold text-uppercase">High vs Low Balance Lift</div>
+                    <div class="fs-4 fw-bold text-success mt-1" id="balance-multiplier-val">--x</div>
+                    <div class="text-muted small mt-1">Conversion propensity multiple</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Balance Chart -->
+              <div class="chart-container mb-4">
+                <canvas id="chart-balance-tiers"></canvas>
+              </div>
+
+              <!-- Balance Table -->
+              <div class="table-responsive">
+                <table class="bi-table">
+                  <thead>
+                    <tr>
+                      <th>Balance Bracket</th>
+                      <th>Cohort Size</th>
+                      <th>Conversions (Rate)</th>
+                      <th>Avg Balance</th>
+                      <th>Total Balance Pool</th>
+                      <th>Avg Contact Touches</th>
+                    </tr>
+                  </thead>
+                  <tbody id="balance-tiers-table-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW: CAMPAIGN ROI & BUDGET OPTIMIZER
+             =================================================================== -->
+        <section class="page-view" id="view-roi">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Campaign ROI &amp; Budget Optimization Simulator</h1>
+              <p>Simulate dialer outreach costs, customer acquisition returns, touchpoint caps, and marketing fatigue savings.</p>
+            </div>
+          </div>
+
+          <!-- Simulator Interactive Parameter Controls -->
+          <div class="simulator-panel">
+            <div class="simulator-param-row">
+              <div class="simulator-param-item">
+                <div class="simulator-param-label">
+                  <span>Outreach Dial Cost ($)</span>
+                  <span class="text-primary font-monospace" id="roi-cost-display">$4.50</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <input type="range" class="form-range" id="roi-cost-slider" min="1" max="25" step="0.5" value="4.5">
+                  <input type="number" class="form-input" id="roi-cost-input" style="width: 85px;" min="1" max="50" step="0.5" value="4.50">
+                </div>
+              </div>
+
+              <div class="simulator-param-item">
+                <div class="simulator-param-label">
+                  <span>Term Deposit Value ($ / Customer)</span>
+                  <span class="text-success font-monospace" id="roi-value-display">$200.00</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <input type="range" class="form-range" id="roi-value-slider" min="50" max="800" step="10" value="200">
+                  <input type="number" class="form-input" id="roi-value-input" style="width: 95px;" min="20" max="2000" step="10" value="200">
+                </div>
+              </div>
+
+              <div class="simulator-param-item">
+                <div class="simulator-param-label">
+                  <span>Contact Touchpoint Policy</span>
+                  <span class="text-muted">Capping Filter</span>
+                </div>
+                <select class="form-select" id="roi-touch-cap">
+                  <option value="all">Unlimited Touches (Actual Baseline)</option>
+                  <option value="3">Cap at 3 Touches (Optimal Fatigue Guard)</option>
+                  <option value="2">Cap at 2 Touches (High Efficiency)</option>
+                  <option value="1">Cap at 1 Touch (Conservative Single Dial)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Financial KPI Cards -->
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-2">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Total Spend</div>
+                <div class="fs-4 fw-bold text-navy-950 mt-1" id="roi-val-spend">$0</div>
+                <div class="text-muted small mt-1">Outreach call costs</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-2">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Gross Revenue</div>
+                <div class="fs-4 fw-bold text-navy-950 mt-1" id="roi-val-revenue">$0</div>
+                <div class="text-muted small mt-1">Acquired deposit value</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Net Profit</div>
+                <div class="fs-4 fw-bold text-success mt-1" id="roi-val-profit">$0</div>
+                <div class="text-muted small mt-1">Revenue minus dial spend</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-2">
+              <div class="card p-3">
+                <div class="text-muted small fw-semibold text-uppercase">Campaign ROI</div>
+                <div class="fs-4 fw-bold text-primary mt-1" id="roi-val-roi">0%</div>
+                <div class="text-muted small mt-1">Net return on spend</div>
+              </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+              <div class="card p-3 bg-danger-subtle border-danger">
+                <div class="text-danger small fw-semibold text-uppercase"><i class="bi bi-shield-x"></i> Fatigue Savings Potential</div>
+                <div class="fs-4 fw-bold text-danger mt-1" id="roi-val-fatigue-savings">$0</div>
+                <div class="text-danger small mt-1">Wasted spend on 4+ touches</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulator Visual & Scenarios -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h2 class="card-title"><i class="bi bi-bar-chart-fill text-primary"></i> Spend vs Revenue vs Net Profit by Policy Scenario</h2>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="chart-roi-simulation"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Policy Comparison Table -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"><i class="bi bi-table text-primary"></i> Policy Scenarios Comparative Scorecard</h2>
+            </div>
+            <div class="table-responsive">
+              <table class="bi-table">
+                <thead>
+                  <tr>
+                    <th>Outreach Policy</th>
+                    <th>Total Dials</th>
+                    <th>Conversions (Rate)</th>
+                    <th>Campaign Spend</th>
+                    <th>Gross Return</th>
+                    <th>Net Profit</th>
+                    <th>ROI (%)</th>
+                    <th>Cost Per Acquisition (CPA)</th>
+                  </tr>
+                </thead>
+                <tbody id="roi-scenarios-table-body">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW: LEAD PROPENSITY & PREDICTIVE SCORING
+             =================================================================== -->
+        <section class="page-view" id="view-propensity">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Predictive Lead Propensity Engine &amp; Scoring Sandbox</h1>
+              <p>Prioritize high-conversion prospects using empirical behavioral weighting and test individual leads live.</p>
+            </div>
+          </div>
+
+          <!-- Top Propensity Tier Metrics -->
+          <div class="row g-3 mb-4">
+            <div class="col-sm-4">
+              <div class="card p-3 border-start border-4 border-success">
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="badge badge-success">High Propensity Tier (&gt;= 30%)</span>
+                  <i class="bi bi-award text-success fs-5"></i>
+                </div>
+                <div class="fs-3 fw-bold text-navy-950 mt-2" id="prop-high-count">--</div>
+                <div class="text-muted small mt-1">Actual Conversion: <strong class="text-success" id="prop-high-rate">--%</strong></div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="card p-3 border-start border-4 border-primary">
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="badge badge-primary">Moderate Propensity (15 - 29%)</span>
+                  <i class="bi bi-hourglass-split text-primary fs-5"></i>
+                </div>
+                <div class="fs-3 fw-bold text-navy-950 mt-2" id="prop-mid-count">--</div>
+                <div class="text-muted small mt-1">Actual Conversion: <strong class="text-primary" id="prop-mid-rate">--%</strong></div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="card p-3 border-start border-4 border-secondary">
+                <div class="d-flex align-items-center justify-content-between">
+                  <span class="badge badge-neutral">Low Propensity (&lt; 15%)</span>
+                  <i class="bi bi-x-circle text-muted fs-5"></i>
+                </div>
+                <div class="fs-3 fw-bold text-navy-950 mt-2" id="prop-low-count">--</div>
+                <div class="text-muted small mt-1">Actual Conversion: <strong class="text-muted" id="prop-low-rate">--%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <!-- Left: Cohort Propensity Distribution & Table -->
+            <div class="col-lg-6">
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h2 class="card-title"><i class="bi bi-pie-chart-fill text-primary"></i> Active Cohort Propensity Breakdown</h2>
+                </div>
+                <div class="card-body">
+                  <div class="chart-container compact mb-3">
+                    <canvas id="chart-propensity-dist"></canvas>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="bi-table">
+                      <thead>
+                        <tr>
+                          <th>Lead Propensity Tier</th>
+                          <th>Prospects</th>
+                          <th>Share</th>
+                          <th>Actual Conversion Rate</th>
+                        </tr>
+                      </thead>
+                      <tbody id="prop-table-body">
+                        <!-- Populated dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Interactive Lead Propensity Sandbox / Calculator -->
+            <div class="col-lg-6">
+              <div class="card h-100">
+                <div class="card-header">
+                  <h2 class="card-title"><i class="bi bi-calculator text-primary"></i> Interactive Lead Scoring Sandbox</h2>
+                  <span class="badge badge-primary">Live Calculator</span>
+                </div>
+                <div class="card-body">
+                  <form id="calc-lead-form" class="row g-2">
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Prospect Age</label>
+                      <input type="number" class="form-input form-input-sm" id="calc-age" value="28" min="18" max="100">
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Occupation (Job)</label>
+                      <select class="form-select form-select-sm" id="calc-job">
+                        <option value="student">Student</option>
+                        <option value="retired">Retired</option>
+                        <option value="management" selected>Management</option>
+                        <option value="technician">Technician</option>
+                        <option value="admin.">Administrative</option>
+                        <option value="blue-collar">Blue-Collar</option>
+                        <option value="services">Services</option>
+                        <option value="self-employed">Self-Employed</option>
+                        <option value="entrepreneur">Entrepreneur</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Marital Status</label>
+                      <select class="form-select form-select-sm" id="calc-marital">
+                        <option value="single" selected>Single</option>
+                        <option value="married">Married</option>
+                        <option value="divorced">Divorced</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Education</label>
+                      <select class="form-select form-select-sm" id="calc-education">
+                        <option value="tertiary" selected>Tertiary (University)</option>
+                        <option value="secondary">Secondary (High School)</option>
+                        <option value="primary">Primary</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Account Balance ($)</label>
+                      <input type="number" class="form-input form-input-sm" id="calc-balance" value="3500">
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Housing Loan Debt?</label>
+                      <select class="form-select form-select-sm" id="calc-housing">
+                        <option value="no" selected>No Housing Loan</option>
+                        <option value="yes">Has Housing Loan</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Contact Channel</label>
+                      <select class="form-select form-select-sm" id="calc-contact">
+                        <option value="cellular" selected>Cellular Mobile</option>
+                        <option value="telephone">Fixed Landline</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Prior Campaign Outcome</label>
+                      <select class="form-select form-select-sm" id="calc-poutcome">
+                        <option value="success">Past Success (Subscribed)</option>
+                        <option value="unknown" selected>Unknown / First Contact</option>
+                        <option value="failure">Past Failure</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-semibold">Contacts This Campaign</label>
+                      <select class="form-select form-select-sm" id="calc-touches">
+                        <option value="1" selected>1 Touch (Initial Outreach)</option>
+                        <option value="2">2 Touches</option>
+                        <option value="3">3 Touches</option>
+                        <option value="4">4+ Touches (Fatigued)</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6 d-flex align-items-end">
+                      <button class="btn btn-primary btn-sm w-100" type="submit">
+                        <i class="bi bi-lightning-charge-fill"></i> Score Prospect
+                      </button>
+                    </div>
+                  </form>
+
+                  <!-- Live Prediction Card -->
+                  <div class="calculator-result-card mt-3">
+                    <div>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <span class="small text-uppercase text-secondary">Predicted Conversion Propensity</span>
+                        <span class="calc-tier-badge badge-success" id="calc-tier-badge">High Propensity</span>
+                      </div>
+                      <div class="calc-score-display">
+                        <span class="calc-score-number" id="calc-score-val">--%</span>
+                        <span class="text-secondary small">Estimated Value: <strong class="text-white" id="calc-expected-val">$0</strong></span>
+                      </div>
+                    </div>
+                    <div class="calc-rec-box" id="calc-rec-text">
+                      Calculating real-time recommendation...
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE VIEW: COHORT A/B COMPARISON & STATISTICAL TEST
+             =================================================================== -->
+        <section class="page-view" id="view-cohort">
+          <div class="view-header">
+            <div class="view-title-group">
+              <h1>Cohort A/B Comparison &amp; Statistical Significance Test</h1>
+              <p>Perform head-to-head empirical testing across customer segments with automated two-proportion Z-tests.</p>
+            </div>
+          </div>
+
+          <!-- Selector Card -->
+          <div class="card mb-4">
+            <div class="card-body p-3">
+              <div class="row align-items-center g-3">
+                <div class="col-md-5">
+                  <label class="form-label small fw-bold text-uppercase text-primary">Cohort A (Test Segment)</label>
+                  <select class="form-select" id="cohort-a-select">
+                    <option value="cellular" selected>Cellular Mobile Outreach</option>
+                    <option value="no_housing">No Housing Debt / Mortgage</option>
+                    <option value="prev_success">Prior Campaign Responders</option>
+                    <option value="high_balance">High Balance (&gt; $2,500)</option>
+                    <option value="youth_senior">Young (&lt;30) &amp; Senior (&gt;60)</option>
+                  </select>
+                </div>
+                <div class="col-md-2 text-center">
+                  <div class="cohort-vs-badge">VS</div>
+                </div>
+                <div class="col-md-5">
+                  <label class="form-label small fw-bold text-uppercase text-secondary">Cohort B (Control Segment)</label>
+                  <select class="form-select" id="cohort-b-select">
+                    <option value="telephone" selected>Fixed Landline Telephone</option>
+                    <option value="has_housing">Active Housing Mortgage</option>
+                    <option value="no_prev_contact">Cold / No Prior Success</option>
+                    <option value="low_balance">Low Balance (&lt;= $1,000)</option>
+                    <option value="middle_aged">Middle-Aged (30 - 60 Years)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Head-to-Head Comparison Scorecard -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h2 class="card-title"><i class="bi bi-speedometer text-primary"></i> Head-to-Head Performance Matrix</h2>
+            </div>
+            <div class="table-responsive">
+              <table class="bi-table">
+                <thead>
+                  <tr>
+                    <th>Metric Dimension</th>
+                    <th><span class="cohort-a-name-display text-primary fw-bold">Cohort A</span></th>
+                    <th><span class="cohort-b-name-display text-secondary fw-bold">Cohort B</span></th>
+                    <th>Variance / Relative Lift</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Cohort Sample Size (N)</strong></td>
+                    <td id="cohort-a-size">--</td>
+                    <td id="cohort-b-size">--</td>
+                    <td><span class="badge badge-neutral">Sample Pool</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Conversions (Subscriptions)</strong></td>
+                    <td id="cohort-a-conv">--</td>
+                    <td id="cohort-b-conv">--</td>
+                    <td><span class="badge badge-info">Term Deposits</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Response Rate (%)</strong></td>
+                    <td><strong class="text-primary fs-5" id="cohort-a-rate">--%</strong></td>
+                    <td><strong class="text-secondary fs-5" id="cohort-b-rate">--%</strong></td>
+                    <td><span class="fs-5 fw-bold text-success" id="cohort-metric-lift">--% Lift</span> (<span id="cohort-metric-diff">--%</span>)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Avg Outreach Touches</strong></td>
+                    <td id="cohort-a-touches">--</td>
+                    <td id="cohort-b-touches">--</td>
+                    <td>Dialer contact load</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Avg Call Duration</strong></td>
+                    <td id="cohort-a-dur">--</td>
+                    <td id="cohort-b-dur">--</td>
+                    <td>Conversation length</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Avg Account Balance</strong></td>
+                    <td id="cohort-a-bal">--</td>
+                    <td id="cohort-b-bal">--</td>
+                    <td>Customer financial liquidity</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Statistical Significance Banner -->
+            <div class="p-3">
+              <div class="sig-banner" id="cohort-sig-banner">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- ===================================================================
@@ -648,6 +1131,9 @@
               </div>
 
               <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-success" id="btn-export-priority-leads" title="Export only High-Propensity leads ready for outreach">
+                  <i class="bi bi-file-earmark-arrow-down-fill"></i> Export Priority Leads
+                </button>
                 <label for="table-page-size" class="small text-muted fw-semibold mb-0">Rows per page:</label>
                 <select class="form-select form-select-sm" id="table-page-size" style="width: auto;">
                   <option value="10">10</option>
@@ -672,6 +1158,7 @@
                     <th class="sortable" data-sort="contact">Channel <i class="bi bi-arrow-down-up sort-icon"></i></th>
                     <th class="sortable" data-sort="campaign">Touches <i class="bi bi-arrow-down-up sort-icon"></i></th>
                     <th class="sortable" data-sort="duration">Call Duration <i class="bi bi-arrow-down-up sort-icon"></i></th>
+                    <th>Propensity</th>
                     <th class="sortable" data-sort="y">Outcome <i class="bi bi-arrow-down-up sort-icon"></i></th>
                   </tr>
                 </thead>
@@ -794,6 +1281,18 @@
                     <td>~2.5 touches/customer</td>
                     <td><span class="badge badge-neutral">Dialer Pipeline</span></td>
                   </tr>
+                  <tr>
+                    <td><strong>Estimated Campaign Spend</strong></td>
+                    <td><span id="report-meta-spend">--</span></td>
+                    <td>$4.50 / dial baseline</td>
+                    <td><span class="badge badge-neutral">Marketing Budget</span></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Net Campaign Profit &amp; ROI</strong></td>
+                    <td><span id="report-meta-profit">--</span> (<span id="report-meta-roi">--</span>)</td>
+                    <td>Positive ROI target</td>
+                    <td><span class="badge badge-success">Financial Efficiency</span></td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -866,6 +1365,31 @@
                   <span class="badge badge-primary me-1">GET</span>
                   <span class="api-endpoint-badge">/api/insights</span>
                   <div class="text-muted small mt-1">Automated data-based observations and test recommendations.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-primary me-1">GET</span>
+                  <span class="api-endpoint-badge">/api/analytics/roi</span>
+                  <div class="text-muted small mt-1">Campaign spend, net profit, CPA, and touch cap policy simulations.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-primary me-1">GET</span>
+                  <span class="api-endpoint-badge">/api/analytics/propensity</span>
+                  <div class="text-muted small mt-1">Predictive lead scoring distributions and actual conversion rates.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-success me-1">POST</span>
+                  <span class="api-endpoint-badge">/api/analytics/propensity/score</span>
+                  <div class="text-muted small mt-1">Scores single lead profiles in real time with recommendations.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-primary me-1">GET</span>
+                  <span class="api-endpoint-badge">/api/analytics/balance</span>
+                  <div class="text-muted small mt-1">Financial balance brackets and liquidity conversion propensities.</div>
+                </div>
+                <div class="mb-2 mt-3">
+                  <span class="badge badge-success me-1">POST</span>
+                  <span class="api-endpoint-badge">/api/analytics/cohort-compare</span>
+                  <div class="text-muted small mt-1">Head-to-head A/B cohort test with two-proportion Z-score significance.</div>
                 </div>
               </div>
             </div>

@@ -25,6 +25,8 @@ def get_dashboard_summary():
         'contact': request.args.get('contact', 'all'),
         'outcome': request.args.get('outcome', 'all'),
         'marital': request.args.get('marital', 'all'),
+        'housing': request.args.get('housing', 'all'),
+        'balance_tier': request.args.get('balance_tier', request.args.get('balanceTier', 'all')),
         'touches': request.args.get('touches', 'all'),
         'search': request.args.get('search', '')
     }

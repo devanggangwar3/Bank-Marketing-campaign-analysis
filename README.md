@@ -113,7 +113,7 @@ npm run dev
 
 ## 🧪 Running Automated Tests
 
-Run the complete backend test suite (19 test cases):
+Run the complete backend test suite (23 test cases):
 ```powershell
 npm test
 ```
@@ -127,6 +127,10 @@ Tests cover:
 - Standardized outcome conversion (`1`/`0`, `yes`/`no`, `true`/`false`).
 - Zero-denominator handling and safe division.
 - Contact fatigue buckets and chronological month sorting.
+- Campaign ROI & Budget simulations with touchpoint capping models.
+- Financial balance tier segmentation and liquidity conversion analysis.
+- Predictive lead scoring algorithms and single-lead propensity calculator.
+- Cohort A/B comparative testing with two-proportion Z-tests and p-value statistical significance.
 - Flask endpoints (`/api/health`, `/api/dashboard`, `/api/upload`, `/api/analytics/*`, `/api/insights`, `/api/reports/export`).
 
 ---
@@ -143,6 +147,11 @@ Tests cover:
 | `GET` | `/api/analytics/channel` | Returns response rates by communication channel | Same as dashboard |
 | `GET` | `/api/analytics/frequency`| Returns contact fatigue decay across touchpoints | Same as dashboard |
 | `GET` | `/api/analytics/segments` | Returns breakdown by Job, Education, Age, Housing | Same as dashboard |
+| `GET` | `/api/analytics/roi` | Simulates spend, gross revenue, net profit, ROI, and fatigue savings | `cost_per_contact`, `value_per_conversion`, `touch_cap`, plus filter params |
+| `GET` | `/api/analytics/balance` | Returns breakdown by customer account balance brackets | Same as dashboard |
+| `GET` | `/api/analytics/propensity` | Returns cohort-wide predictive lead propensity distribution | Same as dashboard |
+| `POST` | `/api/analytics/propensity/score` | Scores single lead profile with conversion probability and strategy | JSON payload with customer attributes |
+| `POST` | `/api/analytics/cohort-compare` | Head-to-head A/B cohort test with Z-test and p-value | JSON payload: `{"cohortA": "...", "cohortB": "..."}` or query params |
 | `GET` | `/api/insights` | Returns dynamic observations and test recommendations | Same as dashboard |
 | `GET` | `/api/filters` | Returns available distinct values for filter selects | None |
 | `GET` | `/api/data/records` | Returns paginated, sorted customer records for table | `page`, `page_size`, `sort_by`, `sort_dir`, and filter params |

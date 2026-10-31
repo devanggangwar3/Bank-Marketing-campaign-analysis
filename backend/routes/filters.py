@@ -55,6 +55,8 @@ def get_data_records():
         'contact': request.args.get('contact', 'all'),
         'outcome': request.args.get('outcome', 'all'),
         'marital': request.args.get('marital', 'all'),
+        'housing': request.args.get('housing', 'all'),
+        'balance_tier': request.args.get('balance_tier', request.args.get('balanceTier', 'all')),
         'touches': request.args.get('touches', 'all'),
         'search': request.args.get('search', '')
     }
@@ -84,6 +86,13 @@ def get_data_records():
 
     page_slice = filtered_df.iloc[start_idx:end_idx]
     records = page_slice.to_dict(orient='records')
+
+    # Enhance records with propensity scoring
+    for r in records:
+        scored = AnalyticsService.score_single_lead(r)
+        r['propensityPercent'] = scored['propensityPercent']
+        r['propensityTier'] = scored['tier']
+        r['propensityClass'] = scored['tierClass']
 
     return jsonify({
         'records': records,

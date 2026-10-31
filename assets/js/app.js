@@ -4,21 +4,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const loginScreen = document.getElementById('login-screen');
-  const loginForm = document.getElementById('login-form');
-  const appContainer = document.querySelector('.app-container');
-
-  if (loginScreen && loginForm && appContainer) {
-    loginForm.addEventListener('submit', event => {
-      event.preventDefault();
-      if (!loginForm.reportValidity()) return;
-
-      appContainer.removeAttribute('aria-hidden');
-      loginScreen.classList.add('is-dismissed');
-      window.setTimeout(() => loginScreen.remove(), 240);
-    });
-  }
-
   // 1. Initialize UI Handlers
   UIEngine.init();
 
@@ -58,10 +43,57 @@ document.addEventListener('DOMContentLoaded', async () => {
       UIEngine.renderCustomerSegments(appState.getFilteredDataset());
     }
 
-    // F. Data Table
+    // F. Financial Balance Tiers View & Chart
+    if (isApi && state.apiData.balance) {
+      UIEngine.renderBalanceView(state.apiData.balance);
+      ChartsEngine.renderBalanceChart('chart-balance-tiers', state.apiData.balance);
+    } else {
+      const balData = AnalyticsEngine.computeBalanceAnalysis(appState.getFilteredDataset());
+      UIEngine.renderBalanceView(balData);
+      ChartsEngine.renderBalanceChart('chart-balance-tiers', balData);
+    }
+
+    // G. ROI & Budget Simulator View & Chart
+    if (isApi && state.apiData.roi) {
+      UIEngine.renderRoiView(state.apiData.roi);
+      ChartsEngine.renderRoiChart('chart-roi-simulation', state.apiData.roi);
+    } else {
+      const roiData = AnalyticsEngine.computeROISimulation(
+        appState.getFilteredDataset(),
+        state.roiParams.costPerContact,
+        state.roiParams.valuePerConversion,
+        state.roiParams.touchCap === 'all' ? null : state.roiParams.touchCap
+      );
+      UIEngine.renderRoiView(roiData);
+      ChartsEngine.renderRoiChart('chart-roi-simulation', roiData);
+    }
+
+    // H. Lead Propensity View & Chart
+    if (isApi && state.apiData.propensity) {
+      UIEngine.renderPropensityView(state.apiData.propensity);
+      ChartsEngine.renderPropensityChart('chart-propensity-dist', state.apiData.propensity);
+    } else {
+      const propData = AnalyticsEngine.computePropensityAnalysis(appState.getFilteredDataset());
+      UIEngine.renderPropensityView(propData);
+      ChartsEngine.renderPropensityChart('chart-propensity-dist', propData);
+    }
+
+    // I. Cohort A/B Comparison View
+    if (isApi && state.apiData.cohorts) {
+      UIEngine.renderCohortComparisonView(state.apiData.cohorts);
+    } else {
+      const cohortData = AnalyticsEngine.computeCohortComparison(
+        appState.getFilteredDataset(),
+        state.cohortParams.cohortA,
+        state.cohortParams.cohortB
+      );
+      UIEngine.renderCohortComparisonView(cohortData);
+    }
+
+    // J. Data Table
     UIEngine.renderTable();
 
-    // G. Report View
+    // K. Report View
     UIEngine.updateReportView(state, kpis);
   };
 

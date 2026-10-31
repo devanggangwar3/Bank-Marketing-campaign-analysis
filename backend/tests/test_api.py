@@ -118,3 +118,49 @@ def test_analytics_endpoints_after_upload(client):
     res_png = client.get('/api/reports/export?format=png')
     assert res_png.status_code == 200
     assert 'image/png' in res_png.content_type
+
+    # ROI Analytics endpoint
+    res_roi = client.get('/api/analytics/roi?cost_per_contact=4.5&value_per_conversion=200')
+    assert res_roi.status_code == 200
+    roi_json = res_roi.get_json()
+    assert 'metrics' in roi_json
+    assert 'scenarios' in roi_json
+    assert roi_json['metrics']['totalCustomers'] == 2
+
+    # Balance Analytics endpoint
+    res_bal = client.get('/api/analytics/balance')
+    assert res_bal.status_code == 200
+    bal_json = res_bal.get_json()
+    assert 'tiers' in bal_json
+    assert 'summary' in bal_json
+
+    # Propensity Distribution endpoint
+    res_prop = client.get('/api/analytics/propensity')
+    assert res_prop.status_code == 200
+    prop_json = res_prop.get_json()
+    assert 'distribution' in prop_json
+    assert 'summary' in prop_json
+
+    # Single Lead Propensity Scoring endpoint
+    res_score = client.post('/api/analytics/propensity/score', json={
+        'age': 25,
+        'job': 'student',
+        'balance': 3000,
+        'contact': 'cellular',
+        'poutcome': 'success'
+    })
+    assert res_score.status_code == 200
+    score_json = res_score.get_json()
+    assert 'propensityPercent' in score_json
+    assert 'tier' in score_json
+
+    # Cohort Comparison endpoint
+    res_cohort = client.post('/api/analytics/cohort-compare', json={
+        'cohortA': 'cellular',
+        'cohortB': 'telephone'
+    })
+    assert res_cohort.status_code == 200
+    cohort_json = res_cohort.get_json()
+    assert 'cohortA' in cohort_json
+    assert 'cohortB' in cohort_json
+    assert 'comparison' in cohort_json

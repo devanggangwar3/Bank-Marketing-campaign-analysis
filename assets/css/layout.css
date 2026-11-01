@@ -45,6 +45,14 @@ html, body {
   transition: width var(--transition-normal), transform var(--transition-normal);
 }
 
+@media (min-width: 992px) {
+  .app-container.sidebar-collapsed .sidebar {
+    width: 0;
+    overflow: hidden;
+    border-right-width: 0;
+  }
+}
+
 .sidebar-header {
   height: var(--header-height);
   padding: 0 1.5rem;
@@ -264,16 +272,6 @@ html, body {
   gap: 1.25rem;
 }
 
-.mobile-nav-toggle {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 1.35rem;
-  color: var(--slate-700);
-  cursor: pointer;
-  padding: 0.35rem;
-}
-
 .active-dataset-indicator {
   display: flex;
   align-items: center;
@@ -303,17 +301,49 @@ html, body {
   color: var(--emerald-700);
 }
 
+.topbar-title {
+  flex: 1;
+  min-width: 0;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  color: var(--primary-800);
+  font-size: clamp(0.85rem, 1.3vw, 1.1rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.topbar-title > span:last-child {
+  background: linear-gradient(100deg, var(--navy-800), var(--primary-600));
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.topbar-title-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--primary-100);
+  border-radius: 10px;
+  background: linear-gradient(145deg, var(--primary-50), #FFFFFF);
+  color: var(--primary-600);
+  font-size: 0.95rem;
+  box-shadow: 0 3px 8px rgba(16, 95, 84, 0.08);
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.topbar-overflow-menu {
-  position: relative;
-}
-
-.topbar-overflow-menu > summary {
+.topbar-menu-toggle {
   width: 40px;
   height: 40px;
   display: flex;
@@ -324,76 +354,24 @@ html, body {
   background: var(--white);
   color: var(--slate-600);
   cursor: pointer;
-  list-style: none;
+  flex-shrink: 0;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.topbar-overflow-menu > summary::-webkit-details-marker {
-  display: none;
-}
-
-.topbar-overflow-menu > summary::marker {
-  content: "";
-}
-
-.topbar-overflow-menu > summary i {
+.topbar-menu-toggle i {
   font-size: 1.25rem;
 }
 
-.topbar-overflow-menu > summary:hover,
-.topbar-overflow-menu[open] > summary {
+.topbar-menu-toggle:hover,
+.topbar-menu-toggle[aria-expanded="true"] {
   color: var(--primary-700);
   border-color: var(--primary-100);
   background: var(--primary-50);
 }
 
-.topbar-overflow-menu > summary:focus-visible,
-.topbar-overflow-panel a:focus-visible {
+.topbar-menu-toggle:focus-visible {
   outline: 3px solid rgba(37, 99, 235, 0.3);
   outline-offset: 2px;
-}
-
-.topbar-overflow-panel {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  z-index: 1030;
-  min-width: 220px;
-  padding: 0.4rem;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  background: var(--white);
-  box-shadow: var(--shadow-lg);
-}
-
-.topbar-overflow-panel a {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.65rem 0.75rem;
-  border-radius: var(--radius-sm);
-  color: var(--slate-700);
-  font-size: 0.84rem;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.topbar-overflow-panel a:hover {
-  background: var(--slate-50);
-  color: var(--primary-700);
-}
-
-.topbar-overflow-panel a i {
-  width: 1rem;
-  color: var(--slate-500);
-  text-align: center;
-}
-
-.topbar-overflow-divider {
-  height: 1px;
-  margin: 0.35rem 0.5rem;
-  background: var(--border-color);
 }
 
 /* Quick Filter Dropdown in Topbar */
@@ -545,10 +523,6 @@ html, body {
     display: block;
   }
 
-  .mobile-nav-toggle {
-    display: block;
-  }
-
   .content-area {
     padding: 1.25rem;
   }
@@ -557,6 +531,10 @@ html, body {
 @media (max-width: 575.98px) {
   .topbar {
     padding: 0 1rem;
+  }
+
+  .topbar-title {
+    display: none;
   }
   
   .content-area {
@@ -589,7 +567,7 @@ html, body {
   .sidebar,
   .topbar,
   .sidebar-backdrop,
-  .mobile-nav-toggle,
+  .topbar-menu-toggle,
   .view-actions-group,
   .filter-bar-card,
   .no-print,

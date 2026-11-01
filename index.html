@@ -32,7 +32,7 @@
     <div class="sidebar-backdrop"></div>
 
     <!-- 1. Left Sidebar Navigation -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="primary-navigation">
       <div class="sidebar-header">
         <a href="#dashboard" class="brand-wrapper" data-view-target="dashboard">
           <div class="brand-icon">
@@ -118,8 +118,8 @@
       <header class="topbar">
 
         <div class="topbar-left">
-          <button class="mobile-nav-toggle" id="mobile-drawer-toggle" aria-label="Toggle Navigation Drawer">
-            <i class="bi bi-list"></i>
+          <button class="topbar-menu-toggle" id="mobile-drawer-toggle" type="button" aria-label="Open navigation menu" aria-controls="primary-navigation" aria-expanded="false" title="Open navigation menu">
+              <i class="bi bi-three-dots" aria-hidden="true"></i>
           </button>
           
           <!-- Active Data Source Badge -->
@@ -128,6 +128,11 @@
             <span class="source-badge">Active Dataset</span>
             <span class="dataset-name-text text-truncate" id="active-dataset-text" style="max-width: 280px;">Benchmark Cohort (1,250 records)</span>
           </div>
+        </div>
+
+        <div class="topbar-title">
+          <span class="topbar-title-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></span>
+          <span>Bank Marketing Campaign Analysis</span>
         </div>
 
         <div class="topbar-right">
@@ -139,21 +144,6 @@
               <span class="workspace-type">Shared Workspace</span>
             </div>
           </div>
-          <details class="topbar-overflow-menu" id="topbar-overflow-menu">
-            <summary aria-label="Open dashboard menu" title="More options">
-              <i class="bi bi-three-dots" aria-hidden="true"></i>
-            </summary>
-            <nav class="topbar-overflow-panel" aria-label="Dashboard shortcuts">
-              <a href="#dashboard" data-view-target="dashboard"><i class="bi bi-grid-1x2-fill" aria-hidden="true"></i> Dashboard</a>
-              <a href="#analytics" data-view-target="analytics"><i class="bi bi-bar-chart-line-fill" aria-hidden="true"></i> Campaign Analytics</a>
-              <a href="#segments" data-view-target="segments"><i class="bi bi-people-fill" aria-hidden="true"></i> Customer Segments</a>
-              <div class="topbar-overflow-divider"></div>
-              <a href="#upload" data-view-target="upload"><i class="bi bi-cloud-arrow-up-fill" aria-hidden="true"></i> Upload Dataset</a>
-              <a href="#reports" data-view-target="reports"><i class="bi bi-file-earmark-text-fill" aria-hidden="true"></i> Executive Reports</a>
-              <a href="#settings" data-view-target="settings"><i class="bi bi-gear-fill" aria-hidden="true"></i> Settings &amp; API</a>
-              <a href="#about" data-view-target="about"><i class="bi bi-info-circle-fill" aria-hidden="true"></i> About Project</a>
-            </nav>
-          </details>
         </div>
       </header>
 

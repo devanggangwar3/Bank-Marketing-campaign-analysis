@@ -14,7 +14,6 @@ const UIEngine = {
     this.bindUploadEvents();
     this.bindReportActions();
     this.bindMobileDrawer();
-    this.bindTopbarMenu();
     this.bindTechnologyInfo();
     this.bindSettings();
     this.bindRoiEvents();
@@ -34,9 +33,11 @@ const UIEngine = {
         const targetView = link.getAttribute('data-view-target');
         appState.setActiveView(targetView);
 
-        // Close mobile drawer if open
-        document.querySelector('.sidebar')?.classList.remove('mobile-open');
-        document.querySelector('.sidebar-backdrop')?.classList.remove('show');
+        if (window.matchMedia('(max-width: 991.98px)').matches) {
+          document.querySelector('.sidebar')?.classList.remove('mobile-open');
+          document.querySelector('.sidebar-backdrop')?.classList.remove('show');
+          this.syncNavigationToggle();
+        }
       });
     });
   },
@@ -48,45 +49,60 @@ const UIEngine = {
     const toggleBtn = document.getElementById('mobile-drawer-toggle');
     const sidebar = document.querySelector('.sidebar');
     const backdrop = document.querySelector('.sidebar-backdrop');
+    const appContainer = document.querySelector('.app-container');
 
-    if (toggleBtn && sidebar && backdrop) {
+    if (toggleBtn && sidebar && backdrop && appContainer) {
+      this.syncNavigationToggle();
+
       toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('mobile-open');
-        backdrop.classList.toggle('show');
+        if (window.matchMedia('(max-width: 991.98px)').matches) {
+          sidebar.classList.toggle('mobile-open');
+          backdrop.classList.toggle('show', sidebar.classList.contains('mobile-open'));
+        } else {
+          appContainer.classList.toggle('sidebar-collapsed');
+        }
+        this.syncNavigationToggle();
       });
 
       backdrop.addEventListener('click', () => {
         sidebar.classList.remove('mobile-open');
         backdrop.classList.remove('show');
+        this.syncNavigationToggle();
       });
+
+      document.addEventListener('keydown', event => {
+        const isMobile = window.matchMedia('(max-width: 991.98px)').matches;
+        const isOpen = isMobile
+          ? sidebar.classList.contains('mobile-open')
+          : !appContainer.classList.contains('sidebar-collapsed');
+
+        if (event.key === 'Escape' && isOpen) {
+          sidebar.classList.remove('mobile-open');
+          backdrop.classList.remove('show');
+          if (!isMobile) appContainer.classList.add('sidebar-collapsed');
+          this.syncNavigationToggle();
+          toggleBtn.focus();
+        }
+      });
+
+      window.addEventListener('resize', () => this.syncNavigationToggle());
     }
   },
 
-  /**
-   * Topbar shortcuts menu dismissal
-   */
-  bindTopbarMenu() {
-    const menu = document.getElementById('topbar-overflow-menu');
-    const trigger = menu?.querySelector('summary');
+  syncNavigationToggle() {
+    const toggleBtn = document.getElementById('mobile-drawer-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const appContainer = document.querySelector('.app-container');
 
-    if (!menu || !trigger) return;
+    if (!toggleBtn || !sidebar || !appContainer) return;
 
-    menu.addEventListener('click', event => {
-      if (event.target instanceof Element && event.target.closest('.topbar-overflow-panel a')) {
-        menu.open = false;
-      }
-    });
+    const isOpen = window.matchMedia('(max-width: 991.98px)').matches
+      ? sidebar.classList.contains('mobile-open')
+      : !appContainer.classList.contains('sidebar-collapsed');
 
-    document.addEventListener('click', event => {
-      if (!menu.contains(event.target)) menu.open = false;
-    });
-
-    menu.addEventListener('keydown', event => {
-      if (event.key === 'Escape' && menu.open) {
-        menu.open = false;
-        trigger.focus();
-      }
-    });
+    toggleBtn.setAttribute('aria-expanded', String(isOpen));
+    toggleBtn.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+    toggleBtn.setAttribute('title', isOpen ? 'Close navigation menu' : 'Open navigation menu');
   },
 
   /**

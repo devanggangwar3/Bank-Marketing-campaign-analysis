@@ -81,8 +81,8 @@ Bank-Marketing-campaign-analysis/
 │       ├── ui.js                        # DOM manipulation, table pagination, toasts
 │       ├── app.js                       # Bootstrap controller
 │       └── data/
-│           └── demoData.js              # Preloaded benchmark dataset (1,250 records)
-├── sample_bank_marketing_data.csv       # Downloadable sample dataset (1,250 records)
+│           └── demoData.js              # Preloaded benchmark dataset (5,000 records)
+├── sample_bank_marketing_data.csv       # Downloadable sample dataset (5,000 records)
 ├── server.js                            # Node static web server with auto-browser launch
 ├── package.json                         # NPM scripts for frontend, backend, and tests
 ├── index.html                           # Main SPA frontend
@@ -99,7 +99,7 @@ python backend/app.py
 ```
 *(or using npm: `npm run backend`)*
 - Runs at: `http://localhost:5000`
-- Automatically initializes the SQLite database and seeds the 1,250 benchmark records.
+- Automatically initializes the SQLite database and seeds the 5,000 benchmark records.
 
 ### Step 2: Start the Frontend (Terminal 2)
 ```powershell

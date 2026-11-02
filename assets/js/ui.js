@@ -47,28 +47,34 @@ const UIEngine = {
    */
   bindMobileDrawer() {
     const toggleBtn = document.getElementById('mobile-drawer-toggle');
+    const collapseBtn = document.getElementById('sidebar-collapse-toggle');
     const sidebar = document.querySelector('.sidebar');
     const backdrop = document.querySelector('.sidebar-backdrop');
     const appContainer = document.querySelector('.app-container');
 
-    if (toggleBtn && sidebar && backdrop && appContainer) {
+    const handleToggle = () => {
+      if (window.matchMedia('(max-width: 991.98px)').matches) {
+        sidebar.classList.toggle('mobile-open');
+        backdrop.classList.toggle('show', sidebar.classList.contains('mobile-open'));
+      } else {
+        appContainer.classList.toggle('sidebar-collapsed');
+      }
+      this.syncNavigationToggle();
+    };
+
+    if (sidebar && appContainer) {
       this.syncNavigationToggle();
 
-      toggleBtn.addEventListener('click', () => {
-        if (window.matchMedia('(max-width: 991.98px)').matches) {
-          sidebar.classList.toggle('mobile-open');
-          backdrop.classList.toggle('show', sidebar.classList.contains('mobile-open'));
-        } else {
-          appContainer.classList.toggle('sidebar-collapsed');
-        }
-        this.syncNavigationToggle();
-      });
+      if (toggleBtn) toggleBtn.addEventListener('click', handleToggle);
+      if (collapseBtn) collapseBtn.addEventListener('click', handleToggle);
 
-      backdrop.addEventListener('click', () => {
-        sidebar.classList.remove('mobile-open');
-        backdrop.classList.remove('show');
-        this.syncNavigationToggle();
-      });
+      if (backdrop) {
+        backdrop.addEventListener('click', () => {
+          sidebar.classList.remove('mobile-open');
+          backdrop.classList.remove('show');
+          this.syncNavigationToggle();
+        });
+      }
 
       document.addEventListener('keydown', event => {
         const isMobile = window.matchMedia('(max-width: 991.98px)').matches;
@@ -78,10 +84,10 @@ const UIEngine = {
 
         if (event.key === 'Escape' && isOpen) {
           sidebar.classList.remove('mobile-open');
-          backdrop.classList.remove('show');
+          backdrop?.classList.remove('show');
           if (!isMobile) appContainer.classList.add('sidebar-collapsed');
           this.syncNavigationToggle();
-          toggleBtn.focus();
+          toggleBtn?.focus();
         }
       });
 
@@ -289,7 +295,7 @@ const UIEngine = {
           }
         } else if (window.DEMO_CAMPAIGN_DATA) {
           appState.setDataset(window.DEMO_CAMPAIGN_DATA, 'demo');
-          this.showToast('Benchmark Cohort Loaded', 'Restored the 1,250 record pre-loaded benchmark campaign dataset.', 'info');
+          this.showToast('Benchmark Cohort Loaded', 'Restored the 5,000 record pre-loaded benchmark campaign dataset.', 'info');
         }
       });
     }
@@ -928,6 +934,8 @@ const UIEngine = {
       const badgeEl = document.getElementById('calc-tier-badge');
       const expectedEl = document.getElementById('calc-expected-val');
       const recEl = document.getElementById('calc-rec-text');
+      const meterFill = document.getElementById('calc-meter-fill');
+      const driversGrid = document.getElementById('calc-drivers-grid');
 
       if (scoreEl) scoreEl.textContent = `${result.propensityPercent}%`;
       if (badgeEl) {
@@ -936,6 +944,32 @@ const UIEngine = {
       }
       if (expectedEl) expectedEl.textContent = `$${result.expectedValue}`;
       if (recEl) recEl.textContent = result.recommendation;
+
+      if (meterFill) {
+        meterFill.style.width = `${Math.min(100, Math.max(5, result.propensityPercent))}%`;
+        if (result.propensityPercent >= 30) {
+          meterFill.style.background = 'linear-gradient(90deg, #10B981, #34D399, #6EE7B7)';
+          meterFill.style.boxShadow = '0 0 12px rgba(52, 211, 153, 0.5)';
+        } else if (result.propensityPercent >= 15) {
+          meterFill.style.background = 'linear-gradient(90deg, #2563EB, #38BDF8, #7DD3FC)';
+          meterFill.style.boxShadow = '0 0 12px rgba(56, 189, 248, 0.5)';
+        } else {
+          meterFill.style.background = 'linear-gradient(90deg, #D97706, #F59E0B, #FCD34D)';
+          meterFill.style.boxShadow = '0 0 12px rgba(245, 158, 11, 0.5)';
+        }
+      }
+
+      if (driversGrid) {
+        const chips = [];
+        if (leadData.poutcome === 'success') chips.push('<div class="calc-driver-chip"><i class="bi bi-star-fill text-warning"></i> Prior Success (+42%)</div>');
+        if (leadData.housing === 'no') chips.push('<div class="calc-driver-chip"><i class="bi bi-house-check text-success"></i> No Housing Loan (+8%)</div>');
+        if (['student', 'retired'].includes(leadData.job)) chips.push('<div class="calc-driver-chip"><i class="bi bi-person-check text-info"></i> High Affinity Role (+16%)</div>');
+        if (leadData.contact === 'cellular') chips.push('<div class="calc-driver-chip"><i class="bi bi-phone text-primary"></i> Cellular Outreach (+6%)</div>');
+        if (leadData.balance > 5000) chips.push('<div class="calc-driver-chip"><i class="bi bi-cash-stack text-success"></i> High Balance Tier (+12%)</div>');
+        if (leadData.campaign <= 2) chips.push('<div class="calc-driver-chip"><i class="bi bi-bullseye text-success"></i> Optimal Touch Window</div>');
+        else chips.push('<div class="calc-driver-chip"><i class="bi bi-exclamation-triangle text-danger"></i> High Touch Fatigue (-10%)</div>');
+        driversGrid.innerHTML = chips.join('');
+      }
     };
 
     form.addEventListener('submit', e => {

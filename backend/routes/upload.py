@@ -89,7 +89,7 @@ def reset_demo():
 
     return jsonify({
         'success': True,
-        'message': 'Restored default benchmark campaign dataset (1,250 records).',
+        'message': 'Restored default benchmark campaign dataset (5,000 records).',
         'datasetId': dataset_id,
         'validRows': validation_result['valid_rows']
     }), 200

@@ -126,7 +126,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderDashboardViews(state);
   });
 
-  // 4. Initialize Data Source: Check Flask Backend first
+  // 4. Always pre-load in-memory dataset so all client-side drill-downs, charts & filters have records
+  if (typeof window.DEMO_CAMPAIGN_DATA !== 'undefined' && Array.isArray(window.DEMO_CAMPAIGN_DATA)) {
+    appState.setDataset(window.DEMO_CAMPAIGN_DATA, 'demo');
+  }
+
+  // 5. Initialize Data Source: Check Flask Backend
   const connected = await appState.checkBackendConnection();
 
   if (connected) {
@@ -136,16 +141,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       'success'
     );
   } else {
-    // Fallback to client-side benchmark dataset
-    if (typeof window.DEMO_CAMPAIGN_DATA !== 'undefined' && Array.isArray(window.DEMO_CAMPAIGN_DATA)) {
-      appState.setDataset(window.DEMO_CAMPAIGN_DATA, 'demo');
-      UIEngine.showToast(
-        'Client-Side Mode Active',
-        'Backend not detected on :5000. Operating in in-memory client mode with benchmark dataset.',
-        'info'
-      );
-    } else {
-      appState.setDataset([], 'demo');
-    }
+    UIEngine.showToast(
+      'Client-Side Mode Active',
+      'Operating in in-memory client mode with benchmark dataset (5,000 records).',
+      'info'
+    );
   }
 });

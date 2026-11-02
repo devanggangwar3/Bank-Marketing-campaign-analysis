@@ -438,20 +438,40 @@ const ChartsEngine = {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
+    // Multi-level data fallback: argument → appState → global demo data
+    let recs = Array.isArray(records) && records.length > 0 ? records : [];
+    if (recs.length === 0 && typeof appState !== 'undefined') {
+      recs = appState.getFilteredDataset();
+    }
+    if (recs.length === 0 && typeof window.DEMO_CAMPAIGN_DATA !== 'undefined') {
+      recs = window.DEMO_CAMPAIGN_DATA;
+    }
+
     const educations = ['Primary', 'Secondary', 'Tertiary', 'Unknown'];
     const withHousingRates = [];
     const noHousingRates = [];
+    const withHousingCounts = [];
+    const noHousingCounts = [];
 
-    const recs = Array.isArray(records) ? records : [];
-
+    // Compute rates inline — avoids any AnalyticsEngine dependency for this chart
     educations.forEach(ed => {
       const edLow = ed.toLowerCase();
       const withH = recs.filter(r => (r.education || '').toLowerCase() === edLow && (r.housing || '').toLowerCase() === 'yes');
-      const noH = recs.filter(r => (r.education || '').toLowerCase() === edLow && (r.housing || '').toLowerCase() === 'no');
+      const noH  = recs.filter(r => (r.education || '').toLowerCase() === edLow && (r.housing || '').toLowerCase() === 'no');
 
-      withHousingRates.push(AnalyticsEngine.computeKPIs(withH).responseRate);
-      noHousingRates.push(AnalyticsEngine.computeKPIs(noH).responseRate);
+      const withConv = withH.filter(r => (r.y || '').toLowerCase() === 'yes').length;
+      const noConv   = noH.filter(r  => (r.y || '').toLowerCase() === 'yes').length;
+
+      withHousingRates.push(withH.length ? Number(((withConv / withH.length) * 100).toFixed(2)) : 0);
+      noHousingRates.push(noH.length   ? Number(((noConv  / noH.length)  * 100).toFixed(2)) : 0);
+      withHousingCounts.push({ total: withH.length, converted: withConv });
+      noHousingCounts.push({ total: noH.length,  converted: noConv  });
     });
+
+    // Compute dynamic max for y-axis
+    const allRates = [...withHousingRates, ...noHousingRates];
+    const maxRate  = allRates.length ? Math.max(...allRates) : 40;
+    const yMax     = Math.ceil((maxRate + 5) / 10) * 10;
 
     this.instances[canvasId] = new Chart(canvas, {
       type: 'bar',
@@ -461,25 +481,53 @@ const ChartsEngine = {
           {
             label: 'No Housing Debt',
             data: noHousingRates,
-            backgroundColor: '#279582',
-            borderRadius: 6,
-            maxBarThickness: 32
+            backgroundColor: 'rgba(16, 185, 129, 0.85)',
+            hoverBackgroundColor: 'rgba(16, 185, 129, 1)',
+            borderColor: '#10B981',
+            borderWidth: 1,
+            borderRadius: 8,
+            borderSkipped: false,
+            maxBarThickness: 40
           },
           {
             label: 'Has Housing Loan',
             data: withHousingRates,
-            backgroundColor: '#768980',
-            borderRadius: 6,
-            maxBarThickness: 32
+            backgroundColor: 'rgba(100, 116, 139, 0.75)',
+            hoverBackgroundColor: 'rgba(100, 116, 139, 0.95)',
+            borderColor: '#64748B',
+            borderWidth: 1,
+            borderRadius: 8,
+            borderSkipped: false,
+            maxBarThickness: 40
           }
         ]
       },
       options: {
         ...this.getDefaultOptions(),
+        plugins: {
+          ...this.getDefaultOptions().plugins,
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                return ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`;
+              },
+              afterBody(items) {
+                const idx = items[0].dataIndex;
+                const isNoH = items[0].datasetIndex === 0;
+                const stats = isNoH ? noHousingCounts[idx] : withHousingCounts[idx];
+                return stats ? [
+                  `Group Volume: ${stats.total} prospects`,
+                  `Converted: ${stats.converted} subscriptions`
+                ] : [];
+              }
+            }
+          }
+        },
         scales: {
           x: { grid: { display: false } },
           y: {
             beginAtZero: true,
+            suggestedMax: yMax,
             ticks: { callback: v => `${v}%` }
           }
         }

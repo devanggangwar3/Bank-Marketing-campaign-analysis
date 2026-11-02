@@ -3,43 +3,6 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Cards & Surfaces
    -------------------------------------------------------------------------- */
 .card {
@@ -92,44 +55,6 @@
   border-top: 1px solid rgba(0,0,0,0.06);
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    KPI Metric Cards
    -------------------------------------------------------------------------- */
 .kpi-grid {
@@ -286,44 +211,6 @@
   color: #991b1b;
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Filter Toolbar Card
    -------------------------------------------------------------------------- */
 .filter-bar-card {
@@ -401,44 +288,6 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Buttons & Badges
    -------------------------------------------------------------------------- */
 .btn {
@@ -551,44 +400,6 @@
   border: 1px solid var(--primary-100);
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Insight Cards System (Observation to test format)
    -------------------------------------------------------------------------- */
 .insights-grid {
@@ -708,44 +519,6 @@
   margin-bottom: 0.2rem;
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Data Table & Pagination
    -------------------------------------------------------------------------- */
 .table-responsive {
@@ -894,44 +667,6 @@
   cursor: not-allowed;
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    CSV Upload Dropzone
    -------------------------------------------------------------------------- */
 .upload-dropzone {
@@ -1002,44 +737,6 @@
   color: var(--slate-700);
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Toast Notifications
    -------------------------------------------------------------------------- */
 .toast-container {
@@ -1114,44 +811,6 @@
   color: var(--slate-700);
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Empty States
    -------------------------------------------------------------------------- */
 .empty-state {
@@ -1190,44 +849,6 @@
   margin-bottom: 1.25rem;
 }
 
-/* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Simulator & Calculator Controls
    -------------------------------------------------------------------------- */
 .simulator-panel {
@@ -1268,88 +889,163 @@
 }
 
 .calculator-result-card {
-  background: linear-gradient(145deg, #0B1528, #16243E);
+  background: linear-gradient(155deg, #0B1528 0%, #112240 60%, #162C4E 100%);
   color: #FFFFFF;
-  border-radius: var(--radius-md);
-  padding: 1.75rem;
-  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+  gap: 1.15rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.calculator-result-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(52, 211, 153, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.calc-result-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .calc-score-display {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  margin: 1rem 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.25rem 0;
+  flex-wrap: wrap;
 }
 
 .calc-score-number {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 3rem;
-  font-weight: 700;
+  font-size: 2.8rem;
+  font-weight: 800;
   color: #34D399;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(52, 211, 153, 0.35);
+}
+
+.calc-metric-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+}
+
+.calc-metric-caption {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94A3B8;
+}
+
+.calc-metric-amount {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #F8FAFC;
+}
+
+/* Visual Propensity Meter */
+.calc-meter-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.calc-meter-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.calc-meter-fill {
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #10B981, #34D399, #6EE7B7);
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.5);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calc-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: #64748B;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Predictive Drivers Grid */
+.calc-drivers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.calc-driver-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.72rem;
+  color: #CBD5E1;
+  font-weight: 500;
 }
 
 .calc-tier-badge {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  padding: 0.35rem 0.75rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 9999px;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .calc-rec-box {
-  background-color: rgba(255, 255, 255, 0.07);
+  background: rgba(15, 23, 42, 0.6);
   border-left: 3px solid #34D399;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border-radius: 0 10px 10px 0;
   padding: 0.85rem 1rem;
-  margin-top: 1rem;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   line-height: 1.5;
   color: #E2E8F0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* --------------------------------------------------------------------------
-   Data Table & Pagination
-   -------------------------------------------------------------------------- */
-
-/* --------------------------------------------------------------------------
-   Elegant Scroll Down Button
-   -------------------------------------------------------------------------- */
-.scroll-down-btn {
-    position: absolute;
-    right: 1rem;
-    top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-    z-index: 1000;
-}
-.scroll-down-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-}
-.scroll-down-btn .arrow-down {
-    font-size: 1.1rem;
-    animation: bounce 2s infinite;
-}
-@keyframes bounce {
-    0%,20%,50%,80%,100% { transform: translateY(0); }
-    40% { transform: translateY(-6px); }
-    60% { transform: translateY(-3px); }
-}
    Cohort Head-to-Head Comparison
    -------------------------------------------------------------------------- */
 .cohort-vs-container {

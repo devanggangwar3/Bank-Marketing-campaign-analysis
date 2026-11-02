@@ -31,22 +31,51 @@
     <!-- Mobile Sidebar Backdrop -->
     <div class="sidebar-backdrop"></div>
 
-    <!-- 1. Left Sidebar Navigation -->
-    <aside class="sidebar" id="primary-navigation">
-      <div class="sidebar-header">
+    <!-- 1. Topbar Header (Now at TOP with Bank Marketing Campaign Analysis) -->
+    <header class="topbar">
+      <div class="topbar-left">
         <a href="#dashboard" class="brand-wrapper" data-view-target="dashboard">
           <div class="brand-icon">
             <i class="bi bi-graph-up-arrow"></i>
           </div>
           <div class="brand-text">
-            <span class="brand-title">BankPulse BI</span>
-            <span class="brand-subtitle">Marketing Intelligence</span>
+            <span class="brand-title">Bank Marketing Campaign Analysis</span>
+            <span class="brand-subtitle">BankPulse BI • Marketing Intelligence</span>
           </div>
         </a>
+
+        <!-- Active Data Source Badge -->
+        <div class="active-dataset-indicator" id="topbar-active-dataset" title="Currently active campaign cohort">
+          <i class="bi bi-database-check text-primary"></i>
+          <span class="source-badge">Active Dataset</span>
+          <span class="dataset-name-text text-truncate" id="active-dataset-text" style="max-width: 280px;">Benchmark Cohort (5,000 records)</span>
+        </div>
       </div>
 
+      <div class="topbar-right">
+        <!-- System Status Indicator (Flask API / Analytics Engine) -->
+        <div class="system-status-card">
+          <div class="status-dot-pulse"></div>
+          <div class="status-info">
+            <span class="status-label">Analytics Engine</span>
+            <span class="status-sub">In-Memory BI Active</span>
+          </div>
+        </div>
+
+        <!-- Shared Workspace Context -->
+        <div class="workspace-context" title="Campaign team shared workspace">
+          <div class="workspace-icon"><i class="bi bi-building" aria-hidden="true"></i></div>
+          <div class="workspace-details">
+            <span class="workspace-name">Campaign Team</span>
+            <span class="workspace-type">Shared Workspace</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. Primary Navigation Bar (Tabs) -->
+    <aside class="sidebar" id="primary-navigation">
       <div class="sidebar-body">
-        <div class="nav-section-title">Campaign Analysis</div>
         <a class="sidebar-nav-link active" data-view-target="dashboard" id="nav-dashboard">
           <i class="bi bi-grid-1x2-fill"></i>
           <span>Dashboard</span>
@@ -74,8 +103,6 @@
           <span>Cohort A/B Comparison</span>
           <span class="sidebar-nav-badge badge-info">Z-Test</span>
         </a>
-
-        <div class="nav-section-title mt-3">Data Operations</div>
         <a class="sidebar-nav-link" data-view-target="upload" id="nav-upload">
           <i class="bi bi-cloud-arrow-up-fill"></i>
           <span>Upload Dataset</span>
@@ -86,66 +113,19 @@
           <span>Executive Reports</span>
           <span class="sidebar-nav-badge badge-success">Export</span>
         </a>
-
-        <div class="nav-section-title mt-3">System</div>
         <a class="sidebar-nav-link" data-view-target="settings" id="nav-settings">
           <i class="bi bi-gear-fill"></i>
           <span>Settings & API</span>
         </a>
-
-        <div class="nav-section-title mt-3">About</div>
         <a class="sidebar-nav-link" data-view-target="about" id="nav-about">
           <i class="bi bi-info-circle-fill"></i>
           <span>About Project</span>
         </a>
       </div>
-
-      <div class="sidebar-footer">
-        <div class="system-status-card">
-          <div class="status-dot-pulse"></div>
-          <div class="status-info">
-            <span class="status-label">Analytics Engine</span>
-            <span class="status-sub">In-Memory BI Active</span>
-          </div>
-        </div>
-      </div>
     </aside>
 
-    <!-- 2. Main Wrapper (Top Navigation & Views) -->
+    <!-- 3. Main Wrapper (Views) -->
     <div class="main-wrapper">
-
-      <!-- Topbar Header -->
-      <header class="topbar">
-
-        <div class="topbar-left">
-          <button class="topbar-menu-toggle" id="mobile-drawer-toggle" type="button" aria-label="Open navigation menu" aria-controls="primary-navigation" aria-expanded="false" title="Open navigation menu">
-              <i class="bi bi-three-dots" aria-hidden="true"></i>
-          </button>
-          
-          <!-- Active Data Source Badge -->
-          <div class="active-dataset-indicator" id="topbar-active-dataset" title="Currently active campaign cohort">
-            <i class="bi bi-database-check text-primary"></i>
-            <span class="source-badge">Active Dataset</span>
-            <span class="dataset-name-text text-truncate" id="active-dataset-text" style="max-width: 280px;">Benchmark Cohort (1,250 records)</span>
-          </div>
-        </div>
-
-        <div class="topbar-title">
-          <span class="topbar-title-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></span>
-          <span>Bank Marketing Campaign Analysis</span>
-        </div>
-
-        <div class="topbar-right">
-          <!-- Shared Workspace Context -->
-          <div class="workspace-context" title="Campaign team shared workspace">
-            <div class="workspace-icon"><i class="bi bi-building" aria-hidden="true"></i></div>
-            <div class="workspace-details">
-              <span class="workspace-name">Campaign Team</span>
-              <span class="workspace-type">Shared Workspace</span>
-            </div>
-          </div>
-        </div>
-      </header>
 
       <!-- Content Area with Multi-View Pages -->
       <main class="content-area">
@@ -933,16 +913,40 @@
 
                   <!-- Live Prediction Card -->
                   <div class="calculator-result-card mt-3">
-                    <div>
-                      <div class="d-flex justify-content-between align-items-center">
-                        <span class="small text-uppercase text-secondary">Predicted Conversion Propensity</span>
+                    <div class="calc-result-header">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="calc-result-label"><i class="bi bi-cpu-fill text-primary"></i> PREDICTED CONVERSION PROPENSITY</span>
                         <span class="calc-tier-badge badge-success" id="calc-tier-badge">High Propensity</span>
                       </div>
                       <div class="calc-score-display">
                         <span class="calc-score-number" id="calc-score-val">--%</span>
-                        <span class="text-secondary small">Estimated Value: <strong class="text-white" id="calc-expected-val">$0</strong></span>
+                        <div class="calc-metric-pill">
+                          <span class="calc-metric-caption">Expected Economic Value</span>
+                          <strong class="calc-metric-amount" id="calc-expected-val">$0</strong>
+                        </div>
                       </div>
                     </div>
+
+                    <!-- Visual Propensity Meter -->
+                    <div class="calc-meter-wrap">
+                      <div class="calc-meter-bar">
+                        <div class="calc-meter-fill" id="calc-meter-fill" style="width: 40%;"></div>
+                      </div>
+                      <div class="calc-meter-labels">
+                        <span>0%</span>
+                        <span>Low (15%)</span>
+                        <span>Moderate (30%)</span>
+                        <span>100%</span>
+                      </div>
+                    </div>
+
+                    <!-- Predictive Drivers Grid -->
+                    <div class="calc-drivers-grid" id="calc-drivers-grid">
+                      <div class="calc-driver-chip"><i class="bi bi-check-circle-fill text-success"></i> Model: Logistic Regression BI</div>
+                      <div class="calc-driver-chip"><i class="bi bi-graph-up-arrow text-info"></i> ROI Optimized</div>
+                      <div class="calc-driver-chip"><i class="bi bi-shield-check text-warning"></i> 95% Confidence</div>
+                    </div>
+
                     <div class="calc-rec-box" id="calc-rec-text">
                       Calculating real-time recommendation...
                     </div>

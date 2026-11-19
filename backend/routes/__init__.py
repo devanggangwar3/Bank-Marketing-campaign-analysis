@@ -5,3 +5,4 @@ from backend.routes.analytics import analytics_bp
 from backend.routes.insights import insights_bp
 from backend.routes.reports import reports_bp
 from backend.routes.filters import filters_bp
+from backend.routes.live import live_bp

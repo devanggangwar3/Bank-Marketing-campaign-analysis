@@ -22,7 +22,8 @@ from backend.routes import (
     analytics_bp,
     insights_bp,
     reports_bp,
-    filters_bp
+    filters_bp,
+    live_bp
 )
 
 def create_app(config_class=Config):
@@ -50,6 +51,7 @@ def create_app(config_class=Config):
     app.register_blueprint(insights_bp)
     app.register_blueprint(reports_bp)
     app.register_blueprint(filters_bp)
+    app.register_blueprint(live_bp)
 
     # Global Error Handlers
     @app.errorhandler(400)

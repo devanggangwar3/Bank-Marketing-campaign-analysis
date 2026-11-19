@@ -8,6 +8,7 @@ const UIEngine = {
    * Initializes all DOM event listeners and navigation
    */
   init() {
+    this.bindThemeToggle();
     this.bindNavigation();
     this.bindFilterEvents();
     this.bindTableEvents();
@@ -20,6 +21,51 @@ const UIEngine = {
     this.bindPropensityEvents();
     this.bindCohortEvents();
     this.bindExportLeadsAction();
+  },
+
+  /**
+   * Dark Mode / Light Mode Theme Switcher
+   */
+  bindThemeToggle() {
+    const toggleBtn = document.getElementById('theme-toggle-btn');
+    const toggleIcon = document.getElementById('theme-toggle-icon');
+    const toggleLabel = document.getElementById('theme-toggle-label');
+
+    const updateToggleUI = (theme) => {
+      const isDark = theme === 'dark';
+      if (toggleIcon) {
+        toggleIcon.className = isDark ? 'bi bi-sun-fill theme-toggle-icon' : 'bi bi-moon-stars-fill theme-toggle-icon';
+      }
+      if (toggleLabel) {
+        toggleLabel.textContent = isDark ? 'Light' : 'Dark';
+      }
+      if (toggleBtn) {
+        toggleBtn.setAttribute('title', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+      }
+    };
+
+    // Initialize state
+    const currentTheme = document.documentElement.getAttribute('data-theme') ||
+      localStorage.getItem('bankpulse_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateToggleUI(currentTheme);
+
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const activeTheme = document.documentElement.getAttribute('data-theme');
+        const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+
+        document.documentElement.setAttribute('data-theme', nextTheme);
+        localStorage.setItem('bankpulse_theme', nextTheme);
+        updateToggleUI(nextTheme);
+
+        // Re-render charts so chart colors & gridlines adapt to the theme
+        if (typeof ChartsEngine !== 'undefined' && typeof appState !== 'undefined') {
+          const recs = appState.getFilteredDataset();
+          ChartsEngine.renderAll(recs);
+        }
+      });
+    }
   },
 
   /**

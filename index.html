@@ -22,6 +22,14 @@
   <link rel="stylesheet" href="assets/css/layout.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/dashboard.css">
+
+  <!-- Early Theme Detection to Prevent Flash -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('bankpulse_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
 </head>
 <body>
 
@@ -70,6 +78,12 @@
             <span class="workspace-type">Shared Workspace</span>
           </div>
         </div>
+
+        <!-- Dark / Light Mode Switcher -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" type="button" aria-label="Toggle dark mode" title="Switch between Dark and Light mode">
+          <i class="bi bi-sun-fill theme-toggle-icon" id="theme-toggle-icon"></i>
+          <span class="theme-toggle-label" id="theme-toggle-label">Light</span>
+        </button>
       </div>
     </header>
 

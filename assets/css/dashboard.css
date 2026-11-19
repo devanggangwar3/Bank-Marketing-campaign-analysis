@@ -797,3 +797,128 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+
+/* ==========================================================================
+   Dark Mode Dashboard & Views Overrides
+   ========================================================================== */
+[data-theme="dark"] .about-project-hero {
+  border-color: rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at 95% 0%, rgba(39, 149, 130, 0.12), transparent 28%),
+    linear-gradient(115deg, #101E1A 0%, #0F1B17 65%, #0C1714 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .about-project-hero h2 {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .about-project-hero p {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .about-project-icon {
+  background: linear-gradient(145deg, #162823, #1A332C);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #5EEAD4;
+}
+
+[data-theme="dark"] .about-project-meta-item {
+  background: #13221E;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .about-project-meta-item:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="dark"] .about-project-meta-item dt {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .about-project-meta-item dd {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .about-project-card .card-header,
+[data-theme="dark"] .about-project-card .card-body,
+[data-theme="dark"] .about-project-roadmap .card-body {
+  background: transparent;
+}
+
+[data-theme="dark"] .about-flow-step {
+  background: #13221E;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .about-flow-step h3 {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .about-flow-step p {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .about-flow-number {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #6EE7B7;
+}
+
+[data-theme="dark"] .about-roadmap-phase,
+[data-theme="dark"] .about-roadmap-phase + .about-roadmap-phase,
+[data-theme="dark"] .about-project-roadmap .card-body > .about-roadmap-phase:first-child {
+  background: #101E1A;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .about-roadmap-phase h3 {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .about-roadmap-step {
+  background: rgba(39, 149, 130, 0.22);
+  color: #5EEAD4;
+}
+
+[data-theme="dark"] .about-stack-info {
+  background: #101E1A;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .about-stack-info strong {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .about-stack-info p {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .about-stack-tag {
+  background: #152722;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #CBD5E1;
+}
+
+[data-theme="dark"] .about-stack-tag:hover,
+[data-theme="dark"] .about-stack-tag[aria-pressed="true"] {
+  background: #1E3B33;
+  border-color: #279582;
+  color: #5EEAD4;
+}
+
+[data-theme="dark"] .spinner-overlay {
+  background-color: rgba(10, 20, 17, 0.85);
+}
+
+[data-theme="dark"] .bi-spinner {
+  border-color: rgba(255, 255, 255, 0.15);
+  border-top-color: #34D399;
+}
+
+[data-theme="dark"] .api-endpoint-badge {
+  background-color: #172B25;
+  color: #A7F3D0;
+}

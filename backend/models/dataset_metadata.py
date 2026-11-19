@@ -89,6 +89,55 @@ class DatasetRepository:
         return dataset_id
 
     @staticmethod
+    def append_single_record(db_path: str, record: dict) -> dict:
+        conn = get_db_connection(db_path)
+        cur = conn.cursor()
+        meta = DatasetRepository.get_active_dataset_metadata(db_path)
+        if not meta:
+            cur.execute("""
+                INSERT INTO datasets (filename, total_rows, valid_rows, skipped_rows, delimiter, is_active, notes)
+                VALUES (?, 0, 0, 0, ',', 1, ?)
+            """, ('Live Stream Session', 'Live Telemetry Stream'))
+            dataset_id = cur.lastrowid
+        else:
+            dataset_id = meta['id']
+
+        cur.execute("""
+            INSERT INTO campaign_records (
+                dataset_id, age, job, marital, education, is_default,
+                balance, housing, loan, contact, day, month,
+                duration, campaign, pdays, previous, poutcome, y
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            dataset_id,
+            int(record.get('age', 35)),
+            str(record.get('job', 'management')).strip().lower(),
+            str(record.get('marital', 'married')).strip().lower(),
+            str(record.get('education', 'secondary')).strip().lower(),
+            str(record.get('default', 'no')).strip().lower(),
+            float(record.get('balance', 1000.0)),
+            str(record.get('housing', 'no')).strip().lower(),
+            str(record.get('loan', 'no')).strip().lower(),
+            str(record.get('contact', 'cellular')).strip().lower(),
+            int(record.get('day', 15)),
+            str(record.get('month', 'may')).strip().lower(),
+            int(record.get('duration', 250)),
+            int(record.get('campaign', 1)),
+            int(record.get('pdays', -1)),
+            int(record.get('previous', 0)),
+            str(record.get('poutcome', 'nonexistent')).strip().lower(),
+            str(record.get('y', 'no')).strip().lower()
+        ))
+        new_id = cur.lastrowid
+        cur.execute("UPDATE datasets SET total_rows = total_rows + 1, valid_rows = valid_rows + 1 WHERE id = ?", (dataset_id,))
+        conn.commit()
+        conn.close()
+
+        record_copy = dict(record)
+        record_copy['id'] = new_id
+        return record_copy
+
+    @staticmethod
     def log_analysis(db_path: str, dataset_id: int, filter_str: str, total_records: int, response_rate: float):
         try:
             conn = get_db_connection(db_path)

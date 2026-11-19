@@ -177,6 +177,20 @@ const ApiClient = {
   getExportUrl(filters = {}, format = 'csv') {
     const qs = this.buildQuery({ ...filters, format });
     return `${this.getBaseUrl()}/reports/export${qs}`;
+  },
+
+  // 13. Live Outreach Simulation & Streaming
+  async simulateLiveInteraction(record = null) {
+    return await this.request('/live/simulate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record ? { record } : {})
+    });
+  },
+
+  // 14. Live Telemetry Summary & Recent Outreaches
+  async fetchLiveStream() {
+    return await this.request('/live/stream');
   }
 };
 

@@ -15,6 +15,15 @@ const ChartsEngine = {
   },
 
   getDefaultOptions() {
+    const isDark = typeof document !== 'undefined' &&
+      document.documentElement.getAttribute('data-theme') === 'dark';
+
+    const textColor = isDark ? '#E2E8F0' : '#334155';
+    const tickColor = isDark ? '#94A3B8' : '#64748B';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226,232,240,0.7)';
+    const tooltipBg = isDark ? 'rgba(11, 20, 17, 0.96)' : 'rgba(15,23,42,0.92)';
+    const tooltipBorder = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255,255,255,0.1)';
+
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -37,18 +46,18 @@ const ChartsEngine = {
               size: 12,
               weight: '700'
             },
-            color: '#334155',
+            color: textColor,
             padding: 18
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(15,23,42,0.92)',
+          backgroundColor: tooltipBg,
           titleFont: { family: "'DM Sans', sans-serif", size: 13, weight: '700' },
           bodyFont: { family: "'DM Sans', sans-serif", size: 12 },
           padding: 14,
           cornerRadius: 12,
           boxPadding: 6,
-          borderColor: 'rgba(255,255,255,0.1)',
+          borderColor: tooltipBorder,
           borderWidth: 1,
           callbacks: {
             label(context) {
@@ -65,15 +74,15 @@ const ChartsEngine = {
           border: { display: false },
           ticks: {
             font: { family: "'DM Sans', sans-serif", size: 11, weight: '600' },
-            color: '#64748B'
+            color: tickColor
           }
         },
         y: {
           border: { dash: [4, 4], display: false },
-          grid: { color: 'rgba(226,232,240,0.7)' },
+          grid: { color: gridColor },
           ticks: {
             font: { family: "'DM Sans', sans-serif", size: 11 },
-            color: '#94A3B8',
+            color: tickColor,
             callback: value => `${value}%`
           }
         }

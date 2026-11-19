@@ -81,10 +81,10 @@ class AppStateStore {
     };
   }
 
-  notify(eventType = 'change') {
+  notify(eventType = 'change', payload = null) {
     this.listeners.forEach(fn => {
       try {
-        fn(this.state, eventType);
+        fn(this.state, eventType, payload);
       } catch (err) {
         console.error('Error in state listener:', err);
       }
@@ -202,6 +202,38 @@ class AppStateStore {
     } else {
       this.notify('dataset_changed');
     }
+  }
+
+  appendLiveRecord(record) {
+    if (!record) return;
+
+    if (!record.id) {
+      const len = this.state.rawDataset.length;
+      const lastId = len > 0 ? (Number(this.state.rawDataset[len - 1].id) || len) : 0;
+      record.id = lastId + 1;
+    }
+
+    this.state.rawDataset.push(record);
+    this.state.lastUpdated = new Date();
+
+    if (this.state.sourceDisplayName) {
+      const totalCount = this.state.rawDataset.length;
+      this.state.sourceDisplayName = this.state.sourceDisplayName.replace(/\([\d,]+\s+records\)/i, `(${totalCount.toLocaleString()} records)`);
+    }
+
+    if (this.state.backendConnected && this.state.apiData.kpis) {
+      const k = this.state.apiData.kpis;
+      k.totalCustomers = (k.totalCustomers || 0) + 1;
+      k.totalContacts = (k.totalContacts || 0) + (Number(record.campaign) || 1);
+      if (record.y === 'yes') {
+        k.conversions = (k.conversions || 0) + 1;
+      }
+      if (k.totalCustomers > 0) {
+        k.responseRate = Number(((k.conversions / k.totalCustomers) * 100).toFixed(2));
+      }
+    }
+
+    this.notify('live_record_added', record);
   }
 
   setFilter(key, value) {

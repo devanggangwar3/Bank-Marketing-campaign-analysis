@@ -61,6 +61,12 @@
       </div>
 
       <div class="topbar-right">
+        <!-- Live Data Stream Controller Pill -->
+        <button class="topbar-live-toggle is-active" id="btn-toggle-live-topbar" type="button" aria-label="Toggle live campaign data streaming" title="Toggle Real-Time Campaign Data Streaming">
+          <span class="live-dot-pulse"></span>
+          <span class="live-toggle-text" id="topbar-live-text">Live: <strong>LIVE</strong></span>
+        </button>
+
         <!-- System Status Indicator (Flask API / Analytics Engine) -->
         <div class="system-status-card">
           <div class="status-dot-pulse"></div>
@@ -174,6 +180,39 @@
               <button class="btn btn-primary" data-view-target="upload">
                 <i class="bi bi-cloud-arrow-up"></i> Upload Campaign Data
               </button>
+            </div>
+          </div>
+
+          <!-- Real-Time Live Outreach Telemetry Banner -->
+          <div class="live-telemetry-banner" id="live-telemetry-banner">
+            <div class="telemetry-left">
+              <div class="telemetry-status-badge active" id="telemetry-status-badge">
+                <span class="live-pulse-dot"></span>
+                <span class="telemetry-status-text" id="telemetry-status-text">LIVE STREAMING ACTIVE</span>
+              </div>
+              <div class="telemetry-ticker-info">
+                <span class="ticker-label"><i class="bi bi-broadcast"></i> Telemetry Feed:</span>
+                <span class="ticker-text" id="telemetry-latest-text">Continuous outbound dialer contacts streaming live...</span>
+              </div>
+            </div>
+
+            <div class="telemetry-right">
+              <div class="stream-speed-controls" role="group" aria-label="Stream Speed">
+                <span class="speed-label"><i class="bi bi-speedometer2"></i> Speed:</span>
+                <button class="btn-speed active" data-speed="3000" id="speed-1x" type="button">1x (3s)</button>
+                <button class="btn-speed" data-speed="1500" id="speed-2x" type="button">2x (1.5s)</button>
+                <button class="btn-speed" data-speed="600" id="speed-5x" type="button">5x (0.6s)</button>
+              </div>
+
+              <div class="stream-btn-actions">
+                <button class="btn btn-sm btn-outline live-control-btn" id="btn-simulate-call" type="button" title="Trigger an immediate single customer call interaction">
+                  <i class="bi bi-telephone-plus"></i> Simulate Call
+                </button>
+                <button class="btn btn-sm btn-primary live-control-btn" id="btn-toggle-stream" type="button" title="Pause or Resume continuous outreach stream">
+                  <i class="bi bi-pause-fill" id="stream-toggle-icon"></i>
+                  <span id="stream-toggle-text">Pause Stream</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -418,6 +457,49 @@
           <!-- Insights Grid (Populated dynamically) -->
           <div class="insights-grid" id="insights-container">
             <!-- Dynamic insight cards will be injected here -->
+          </div>
+
+          <!-- Real-Time Outbound Campaign Telemetry Stream Feed -->
+          <div class="card mt-4 live-stream-card" id="live-stream-feed-card">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <div>
+                <h2 class="card-title">
+                  <span class="live-pulse-dot align-middle me-1"></span>
+                  <span>Live Outbound Outreach Stream Feed</span>
+                </h2>
+                <div class="card-subtitle">Real-time dialer telemetry stream, demographic profiling, lead propensity scoring & response outcomes</div>
+              </div>
+              <div class="live-card-actions d-flex align-items-center gap-2">
+                <span class="badge badge-outline" id="live-feed-counter">0 events received</span>
+                <button class="btn btn-sm btn-outline" id="btn-clear-live-log" type="button" title="Clear visible feed log">
+                  <i class="bi bi-eraser"></i> Clear Feed
+                </button>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+                <table class="table table-hover live-telemetry-table mb-0" id="live-stream-table">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 105px;">Time</th>
+                      <th style="min-width: 85px;">Customer ID</th>
+                      <th style="min-width: 160px;">Occupation & Age</th>
+                      <th style="min-width: 120px;">Housing Debt</th>
+                      <th style="min-width: 95px;">Touches</th>
+                      <th style="min-width: 130px;">Call Duration</th>
+                      <th style="min-width: 110px;">Channel</th>
+                      <th style="min-width: 110px;">Propensity</th>
+                      <th style="min-width: 130px;">Outcome</th>
+                    </tr>
+                  </thead>
+                  <tbody id="live-stream-tbody">
+                    <tr class="live-empty-row text-center text-muted py-4">
+                      <td colspan="9" class="py-4">Connecting to live campaign telemetry stream...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -1648,6 +1730,7 @@
   <script src="assets/js/csvParser.js"></script>
   <script src="assets/js/analytics.js"></script>
   <script src="assets/js/charts.js"></script>
+  <script src="assets/js/liveStream.js"></script>
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/app.js"></script>
 </body>

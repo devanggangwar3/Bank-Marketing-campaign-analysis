@@ -124,3 +124,4 @@ def get_live_stream_summary():
         'recentRecords': recent_records,
         'kpis': kpis
     }), 200
+

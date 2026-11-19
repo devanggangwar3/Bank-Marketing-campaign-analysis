@@ -21,6 +21,11 @@ const UIEngine = {
     this.bindPropensityEvents();
     this.bindCohortEvents();
     this.bindExportLeadsAction();
+
+    // Initialize Real-Time Outbound Campaign Telemetry Engine
+    if (typeof LiveStreamEngine !== 'undefined') {
+      LiveStreamEngine.init();
+    }
   },
 
   /**
@@ -624,6 +629,15 @@ const UIEngine = {
 
     const elPrevSuccess = document.getElementById('kpi-val-prev-success');
     if (elPrevSuccess) elPrevSuccess.textContent = `${kpis.previousSuccessRate || 0}%`;
+  },
+
+  pulseKPIs() {
+    const cards = document.querySelectorAll('.kpi-card');
+    cards.forEach(card => {
+      card.classList.remove('kpi-live-pulse');
+      void card.offsetWidth;
+      card.classList.add('kpi-live-pulse');
+    });
   },
 
   renderInsights(insights) {

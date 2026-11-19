@@ -1475,3 +1475,368 @@
 [data-theme="dark"] .doughnut-center-label {
   color: #94A3B8 !important;
 }
+
+
+/* ==========================================================================
+   REAL-TIME LIVE CAMPAIGN TELEMETRY & STREAMING STYLES
+   ========================================================================== */
+
+/* 1. Topbar Live Stream Toggle Button */
+.topbar-live-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #065F46;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.2s ease);
+}
+
+.topbar-live-toggle:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.55);
+}
+
+.topbar-live-toggle:not(.is-active) {
+  background: rgba(100, 116, 139, 0.12);
+  border-color: rgba(100, 116, 139, 0.28);
+  color: var(--slate-600, #475569);
+}
+
+/* Pulsing beacon dots */
+.live-dot-pulse {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #10B981;
+  position: relative;
+}
+
+.topbar-live-toggle.is-active .live-dot-pulse,
+.live-pulse-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #10B981;
+  position: relative;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: liveBeaconPulse 1.8s infinite;
+}
+
+.topbar-live-toggle:not(.is-active) .live-dot-pulse,
+.telemetry-status-badge.paused .live-pulse-dot {
+  background-color: #94A3B8;
+  animation: none;
+  box-shadow: none;
+}
+
+@keyframes liveBeaconPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.75);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* 2. Real-Time Live Outreach Telemetry Banner */
+.live-telemetry-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.95rem 1.4rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 244, 0.85));
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-left: 4px solid #10B981;
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.08);
+}
+
+.telemetry-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+
+.telemetry-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.telemetry-status-badge.active {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #047857;
+}
+
+.telemetry-status-badge.paused {
+  background: rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #64748B;
+}
+
+.telemetry-ticker-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--slate-700, #334155);
+}
+
+.telemetry-ticker-info .ticker-label {
+  font-weight: 700;
+  color: #065F46;
+  white-space: nowrap;
+}
+
+.telemetry-ticker-info .ticker-text {
+  font-family: inherit;
+  color: var(--slate-800, #1E293B);
+}
+
+.telemetry-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Speed Controls */
+.stream-speed-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.22rem 0.35rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.speed-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--slate-600, #475569);
+  padding: 0 0.4rem;
+}
+
+.btn-speed {
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm, 6px);
+  color: var(--slate-700, #334155);
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s ease);
+}
+
+.btn-speed:hover {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+
+.btn-speed.active {
+  background: #10B981;
+  color: #FFFFFF;
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.35);
+}
+
+.stream-btn-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.live-control-btn {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-md, 8px);
+}
+
+/* 3. Live Telemetry Stream Table */
+.live-stream-card {
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-top: 3px solid #10B981;
+}
+
+.live-telemetry-table {
+  font-size: 0.85rem;
+}
+
+.live-telemetry-table th {
+  background-color: rgba(240, 253, 244, 0.6);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #065F46;
+  border-bottom: 2px solid rgba(16, 185, 129, 0.2);
+  padding: 0.75rem 1rem;
+}
+
+.live-telemetry-table td {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.live-row-enter {
+  animation: liveRowSlideIn 0.8s ease-out;
+}
+
+.row-converted {
+  background-color: rgba(16, 185, 129, 0.06);
+}
+
+@keyframes liveRowSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+    background-color: rgba(16, 185, 129, 0.22);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 4. KPI Pulse Animation */
+.kpi-live-pulse {
+  animation: kpiPulseAnim 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes kpiPulseAnim {
+  0% {
+    transform: scale(1);
+    box-shadow: var(--shadow-sm);
+  }
+  35% {
+    transform: scale(1.025);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.38), 0 8px 20px rgba(16, 185, 129, 0.15);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+/* 5. Dark Mode Overrides for Live Components */
+[data-theme="dark"] .topbar-live-toggle {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: #6EE7B7;
+}
+
+[data-theme="dark"] .topbar-live-toggle:not(.is-active) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .live-telemetry-banner {
+  background: linear-gradient(135deg, #101E1A, #142823);
+  border-color: rgba(16, 185, 129, 0.35);
+  border-left-color: #10B981;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .telemetry-status-badge.active {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #6EE7B7;
+}
+
+[data-theme="dark"] .telemetry-status-badge.paused {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .telemetry-ticker-info {
+  color: #CBD5E1;
+}
+
+[data-theme="dark"] .telemetry-ticker-info .ticker-label {
+  color: #6EE7B7;
+}
+
+[data-theme="dark"] .telemetry-ticker-info .ticker-text {
+  color: #F1F5F9;
+}
+
+[data-theme="dark"] .stream-speed-controls {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .speed-label {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .btn-speed {
+  color: #CBD5E1;
+}
+
+[data-theme="dark"] .btn-speed:hover {
+  background: rgba(16, 185, 129, 0.22);
+  color: #6EE7B7;
+}
+
+[data-theme="dark"] .btn-speed.active {
+  background: #10B981;
+  color: #042F2E;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .live-stream-card {
+  background: #101E1A;
+  border-color: rgba(255, 255, 255, 0.1);
+  border-top-color: #10B981;
+}
+
+[data-theme="dark"] .live-telemetry-table th {
+  background-color: #13241F;
+  color: #6EE7B7;
+  border-bottom-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .live-telemetry-table td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  color: #E2E8F0;
+}
+
+[data-theme="dark"] .row-converted {
+  background-color: rgba(16, 185, 129, 0.12);
+}
+
+[data-theme="dark"] .live-telemetry-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}

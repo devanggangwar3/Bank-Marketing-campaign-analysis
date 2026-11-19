@@ -739,6 +739,22 @@ const ChartsEngine = {
     });
   },
 
+  updateLiveOutcome(kpis) {
+    const chart = this.instances['chart-outcome'];
+    if (!chart || !kpis) return;
+    const conversions = Number(kpis.conversions) || 0;
+    const total = Number(kpis.totalCustomers) || 0;
+    const nonConversions = Math.max(0, total - conversions);
+    if (chart.data && chart.data.datasets && chart.data.datasets[0]) {
+      chart.data.datasets[0].data = [conversions, nonConversions];
+      chart.update('none');
+    }
+    const centerEl = document.getElementById('doughnut-center-rate');
+    if (centerEl && kpis.responseRate !== undefined) {
+      centerEl.textContent = `${kpis.responseRate}%`;
+    }
+  },
+
   renderAll(records) {
     this.renderPeriodChart('chart-period', records);
     this.renderChannelChart('chart-channel', records);

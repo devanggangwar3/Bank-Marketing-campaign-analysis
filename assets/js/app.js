@@ -99,6 +99,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // 3. Subscribe to state updates
   appState.subscribe((state, eventType) => {
+    // Live records update the telemetry ticker, KPIs, and live feed table without disruptive full chart rebuilds
+    if (eventType === 'live_record_added') {
+      UIEngine.updateHeaderIndicators(state);
+      return;
+    }
+
     // Handle view tab switching
     if (eventType === 'view_changed') {
       const activeView = state.activeView;

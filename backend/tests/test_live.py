@@ -82,3 +82,4 @@ def test_live_stream_endpoint(client):
     assert len(data['recentRecords']) >= 2
     assert 'kpis' in data
     assert data['totalRecords'] >= 2
+
